@@ -1,0 +1,59 @@
+# ===================================
+# GITIGNORE FULLSTACK PROJECT
+# Frontend (Next.js) + Backend (Java/Maven)
+# ===================================
+
+# ===================================
+# FRONTEND (Next.js/React)
+# ===================================
+
+# Dependencies
+frontend/my-app/node_modules/
+frontend/my-app/.pnp
+frontend/my-app/.pnp.js
+frontend/my-app/.yarn/install-state.gz
+
+# Next.js build output
+frontend/my-app/.next/
+frontend/my-app/out/
+frontend/my-app/build/
+frontend/my-app/dist/
+
+# Next.js cache
+frontend/my-app/.next/cache/
+
+# Environment variables
+frontend/my-app/.env
+frontend/my-app/.env.local
+frontend/my-app/.env.development.local
+frontend/my-app/.env.test.local
+frontend/my-app/.env.production.local
+
+# Logs
+frontend/my-app/npm-debug.log*
+frontend/my-app/yarn-debug.log*
+frontend/my-app/yarn-error.log*
+frontend/my-app/pnpm-debug.log*
+frontend/my-app/lerna-debug.log*
+
+# Runtime data
+frontend/my-app/pids
+frontend/my-app/*.pid
+frontend/my-app/*.seed
+frontend/my-app/*.pid.lock
+
+# Coverage directory used by tools like istanbul
+frontend/my-app/coverage/
+frontend/my-app/*.lcov
+
+# ESLint cache
+frontend/my-app/.eslintcache
+
+# TypeScript cache
+frontend/my-app/*.tsbuildinfo
+frontend/my-app/.tscache
+
+# ===================================
+# BACKEND (Java/Maven/Spring Boot)
+# ===================================
+
