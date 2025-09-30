@@ -95,6 +95,16 @@ public class PedidoService {
 
     public void deletarPedido(Long id){
         Pedido pedidoDeletar = FindByIdOrThrow(id);
+        for (ItemPedido item : pedidoDeletar.getItens()) {
+            Produto produto = item.getProduto();
+            produto.setQuantidade(produto.getQuantidade() + item.getQuantidade());
+
+            if (produto.getQuantidade() > 0) {
+                produto.setStatusProduto(StatusProduto.DISPONIVEL);
+            }
+
+            produtoRepository.save(produto);
+        }
         pedidoRepository.delete(pedidoDeletar);
     }
 
