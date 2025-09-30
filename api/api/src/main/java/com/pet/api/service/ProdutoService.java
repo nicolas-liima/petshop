@@ -4,7 +4,6 @@ package com.pet.api.service;
 import com.pet.api.dto.produto.ProdutoRequestDTO;
 import com.pet.api.dto.produto.ProdutoResponseDTO;
 import com.pet.api.model.Produto;
-import com.pet.api.model.StatusProduto;
 import com.pet.api.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,31 +23,37 @@ public class ProdutoService {
         Produto produto = FindByIdOrThrow(id);
         return new ProdutoResponseDTO(produto);
     }
-    public ProdutoResponseDTO criarProduto(ProdutoRequestDTO produtoRequest){
+    public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto){
 
-        Produto produto = new produto();
-        produto.setNome(produto.getNome());
-        produto.setQuantidade(produto.getQuantidade());
-        produto.setPreco(produto.getPreco());
-        produto.setStatusProduto(StatusProduto.DISPONIVEL);
+        Produto produto = new Produto();
+        produto.setNome(dto.getNome());
+        produto.setPreco(dto.getPreco());
+        produto.setQuantidade(dto.getQuantidade());
 
-        Produto produtoSalvo = ProdutoRepository.save();
-        return new ProdutoResponseDTO(produtoSalvo);
+        Produto salvo = produtoRepository.save(produto);
+
+        ProdutoResponseDTO response = new ProdutoResponseDTO();
+        response.setId(salvo.getId());
+        response.setNome(salvo.getNome());
+        response.setPreco(salvo.getPreco());
+        response.setQuantidade(salvo.getQuantidade());
+        response.setStatusProduto(salvo.getStatusProduto());
+
+        return response;
     }
     public ProdutoResponseDTO atualizarProduto(ProdutoRequestDTO produtoRequest, Long id){
         Produto produtoAtualizar = FindByIdOrThrow(id);
         produtoAtualizar.setNome(produtoRequest.getNome());
         produtoAtualizar.setQuantidade(produtoRequest.getQuantidade());
         produtoAtualizar.setPreco(produtoRequest.getPreco());
-        produtoAtualizar.setStatusProduto(ProdutoRequestDTO.getStatusProduto());
 
-        Produto produtoAtualizado = ProdutoRepository.save(produtoAtualizar);
+        Produto produtoAtualizado = produtoRepository.save(produtoAtualizar);
 
         return new ProdutoResponseDTO(produtoAtualizado);
     }
     public void deletarProduto(Long id){
         Produto produtoDeletar = FindByIdOrThrow(id);
-        ProdutoRepository.delete(produtoDeletar);
+        produtoRepository.delete(produtoDeletar);
     }
 
     private Produto FindByIdOrThrow(Long id){

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,20 +26,21 @@ public class ProdutoController {
     }
     @GetMapping
     public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos(){
-        return new ResponseEntity.ok(produtoService.listarTodosProdutos());
+        return ResponseEntity.ok(produtoService.listarTodosProdutos());
     }
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> listarProduto(@PathVariable Long id){
-        return new ResponseEntity.ok(produtoService.listarPorId(id));
+        return ResponseEntity.ok(produtoService.listarPorId(id));
     }
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponseDTO> atualizarProduto(@Valid @PathVariable Long id, @RequestBody ProdutoRequestDTO produtoRequest){
-        return new ResponseEntity.ok(produtoService.atualizarProduto(produtoRequest, id));
+        return ResponseEntity.ok(produtoService.atualizarProduto(produtoRequest, id));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarProduto(@PathVariable Long id){
         produtoService.deletarProduto(id);
         return ResponseEntity.noContent().build();
     }
+
 
 }

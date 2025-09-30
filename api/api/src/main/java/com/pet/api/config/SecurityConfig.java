@@ -33,6 +33,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Login público
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll() // Cadastro público
+                        .requestMatchers(HttpMethod.POST, "/produtos").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/produtos/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/produtos/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/pedidos").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/pedidos/{id}").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Console H2 público
                         .anyRequest().authenticated() // Demais rotas protegidas
                 )

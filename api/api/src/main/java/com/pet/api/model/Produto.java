@@ -1,16 +1,12 @@
 package com.pet.api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity(name = "produto")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +16,23 @@ public class Produto {
     private String nome;
 
     @Column(nullable = false)
-    private Float preco;
+    private BigDecimal preco;
 
     @Column(nullable = false)
     private int quantidade;
 
     @Enumerated(EnumType.STRING)
     private StatusProduto statusProduto;
+
+    @PrePersist
+    @PreUpdate
+    public void atualizarStatus() {
+        if (quantidade <= 0) {
+            statusProduto = StatusProduto.INDISPONIVEL;
+        } else {
+            statusProduto = StatusProduto.DISPONIVEL;
+        }
+    }
+
 
 }
