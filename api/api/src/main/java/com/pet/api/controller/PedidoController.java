@@ -26,4 +26,9 @@ public class PedidoController {
         pedidoService.deletarPedido(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoResponseDTO> buscarPedido(@PathVariable Long id) {
+        PedidoResponseDTO pedido = pedidoService.buscarPedidoPorId(id);
+        return ResponseEntity.ok(pedido);
+    }
 }

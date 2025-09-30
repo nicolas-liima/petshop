@@ -93,6 +93,28 @@ public class PedidoService {
         return response;
     }
 
+    @Transactional(readOnly = true)
+    public PedidoResponseDTO buscarPedidoPorId(Long id) {
+        Pedido pedido = FindByIdOrThrow(id);
+
+        PedidoResponseDTO response = new PedidoResponseDTO();
+        response.setId(pedido.getId());
+        response.setTotal(pedido.getTotal());
+        response.setUsuarioNome(pedido.getUsuario().getNome());
+
+        List<PedidoResponseDTO.PedidoDetalheDTO> detalheItens = new ArrayList<>();
+        for (ItemPedido item : pedido.getItens()) {
+            PedidoResponseDTO.PedidoDetalheDTO detalhe = new PedidoResponseDTO.PedidoDetalheDTO();
+            detalhe.setNomeProduto(item.getProduto().getNome());
+            detalhe.setQuantidade(item.getQuantidade());
+            detalhe.setSubtotal(item.getSubtotal());
+            detalheItens.add(detalhe);
+        }
+        response.setItens(detalheItens);
+
+        return response;
+    }
+
     public void deletarPedido(Long id){
         Pedido pedidoDeletar = FindByIdOrThrow(id);
         for (ItemPedido item : pedidoDeletar.getItens()) {
