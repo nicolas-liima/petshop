@@ -1,6 +1,7 @@
 package com.pet.api.dto.produto;
 
 
+import com.pet.api.model.Usuario;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

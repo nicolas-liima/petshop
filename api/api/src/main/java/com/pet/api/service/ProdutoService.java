@@ -4,8 +4,12 @@ package com.pet.api.service;
 import com.pet.api.dto.produto.ProdutoRequestDTO;
 import com.pet.api.dto.produto.ProdutoResponseDTO;
 import com.pet.api.model.Produto;
+import com.pet.api.model.Usuario;
 import com.pet.api.repository.ProdutoRepository;
+import com.pet.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +17,8 @@ import java.util.List;
 @Service
 public class ProdutoService {
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
     @Autowired
     private ProdutoRepository produtoRepository;
 
@@ -23,12 +29,44 @@ public class ProdutoService {
         Produto produto = FindByIdOrThrow(id);
         return new ProdutoResponseDTO(produto);
     }
+    public List<ProdutoResponseDTO> listarProdutosDoUsuario() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return produtoRepository.findByUsuario(usuario)
+                .stream()
+                .map(ProdutoResponseDTO::new)
+                .toList();
+    }
+
     public ProdutoResponseDTO criarProduto(ProdutoRequestDTO dto){
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         Produto produto = new Produto();
         produto.setNome(dto.getNome());
         produto.setPreco(dto.getPreco());
         produto.setQuantidade(dto.getQuantidade());
+        produto.setUsuario(usuario);
 
         Produto salvo = produtoRepository.save(produto);
 

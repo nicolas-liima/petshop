@@ -8,6 +8,8 @@ import com.pet.api.repository.PedidoRepository;
 
 import com.pet.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +30,17 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO criarVenda(PedidoRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + dto.getUsuarioId()));
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername();
+        } else {
+            email = principal.toString();
+        }
+        Usuario usuario = usuarioRepository.findByEmail(email).
+                orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
 
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
@@ -82,7 +93,7 @@ public class PedidoService {
 
         List<PedidoResponseDTO.PedidoDetalheDTO> detalheItens = new ArrayList<>();
         for (ItemPedido item : itensPedido) {
-            PedidoResponseDTO.PedidoDetalheDTO detalhe = new PedidoResponseDTO.PedidoDetalheDTO();
+            PedidoResponseDTO.PedidoDetalheDTO detalhe = new PedidoResponseDTO.PedidoDetalheDTO(item);
             detalhe.setNomeProduto(item.getProduto().getNome());
             detalhe.setQuantidade(item.getQuantidade());
             detalhe.setSubtotal(item.getSubtotal());
@@ -104,17 +115,31 @@ public class PedidoService {
 
         List<PedidoResponseDTO.PedidoDetalheDTO> detalheItens = new ArrayList<>();
         for (ItemPedido item : pedido.getItens()) {
-            PedidoResponseDTO.PedidoDetalheDTO detalhe = new PedidoResponseDTO.PedidoDetalheDTO();
-            detalhe.setNomeProduto(item.getProduto().getNome());
-            detalhe.setQuantidade(item.getQuantidade());
-            detalhe.setSubtotal(item.getSubtotal());
-            detalheItens.add(detalhe);
+            detalheItens.add(new PedidoResponseDTO.PedidoDetalheDTO(item));
         }
         response.setItens(detalheItens);
 
         return response;
     }
 
+    public List<PedidoResponseDTO> listarPedidosDoUsuario(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String email;
+        if (principal instanceof UserDetails userDetails) {
+            email = userDetails.getUsername();
+        } else {
+            email = principal.toString();
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return pedidoRepository.findByUsuario(usuario)
+                .stream()
+                .map(PedidoResponseDTO::new)
+                .toList();
+    }
     public void deletarPedido(Long id){
         Pedido pedidoDeletar = FindByIdOrThrow(id);
         for (ItemPedido item : pedidoDeletar.getItens()) {

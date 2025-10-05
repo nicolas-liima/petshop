@@ -24,6 +24,11 @@ public class ProdutoController {
         ProdutoResponseDTO produtoNovo = produtoService.criarProduto(produtoRequest);
         return new ResponseEntity<>(produtoNovo, HttpStatus.CREATED);
     }
+    @GetMapping("/meus")
+    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutosDoUsuario() {
+        List<ProdutoResponseDTO> produtos = produtoService.listarProdutosDoUsuario();
+        return ResponseEntity.ok(produtos);
+    }
     @GetMapping
     public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos(){
         return ResponseEntity.ok(produtoService.listarTodosProdutos());

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
@@ -16,6 +18,11 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
+    @GetMapping("/meus")
+    public ResponseEntity<List<PedidoResponseDTO>> listarPedidosDoUsuario() {
+        List<PedidoResponseDTO> pedidos = pedidoService.listarPedidosDoUsuario();
+        return ResponseEntity.ok(pedidos);
+    }
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> criarPedido(@RequestBody PedidoRequestDTO pedidoRequest) {
         PedidoResponseDTO pedidoResponse = pedidoService.criarVenda(pedidoRequest);
