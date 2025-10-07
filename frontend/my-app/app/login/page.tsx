@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +31,22 @@ export default function LoginPage() {
 
       if (response.ok) {
         const result = await response.json();
-        alert('Login realizado com sucesso!');
-        console.log('Token recebido:', result.token);
-        // Aqui você pode salvar o token no localStorage ou context
-        localStorage.setItem('authToken', result.token);
-        // Redirecionar para página principal ou dashboard
-        window.location.href = '/';
+        
+        // Buscar dados do usuário usando o email
+        const userResponse = await fetch(`http://localhost:8080/usuarios/email/${email}`, {
+          headers: {
+            'Authorization': `Bearer ${result.token}`
+          }
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          login(result.token, userData);
+          alert('Login realizado com sucesso!');
+          router.push('/');
+        } else {
+          alert('Erro ao buscar dados do usuário');
+        }
       } else {
         const errorData = await response.json();
         alert(`Erro no login: ${errorData.message || 'Credenciais inválidas'}`);

@@ -13,14 +13,29 @@ export default function EsqueceuSenhaPage() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Aqui você pode adicionar a lógica de recuperação de senha
-    console.log('Password reset request for:', email);
-    
-    // Simular delay de requisição
-    setTimeout(() => {
+    try {
+      // Verificar se o usuário existe pelo email
+      const response = await fetch(`http://localhost:8080/usuarios/email/${email}`);
+      
+      if (response.ok) {
+        const usuario = await response.json();
+        console.log('Usuário encontrado:', usuario);
+        setMessage('Se o email estiver cadastrado, você receberá instruções para redefinir sua senha.');
+        
+        // Em uma implementação real, aqui você enviaria um email com token de recuperação
+        // Por enquanto, apenas mostramos uma mensagem de sucesso
+      } else if (response.status === 404) {
+        // Mesmo que o usuário não exista, mostramos a mesma mensagem por segurança
+        setMessage('Se o email estiver cadastrado, você receberá instruções para redefinir sua senha.');
+      } else {
+        setMessage('Erro ao processar solicitação. Tente novamente mais tarde.');
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      setMessage('Erro de conexão com o servidor. Verifique se a API está rodando.');
+    } finally {
       setIsLoading(false);
-      setMessage('Se o email estiver cadastrado, você receberá instruções para redefinir sua senha.');
-    }, 1000);
+    }
   };
 
   return (
