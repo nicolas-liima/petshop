@@ -6,6 +6,7 @@ interface User {
   id: number;
   nome: string;
   email: string;
+  tipoUsuario: string;
 }
 
 interface AuthContextType {

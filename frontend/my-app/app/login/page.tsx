@@ -33,7 +33,7 @@ export default function LoginPage() {
         const result = await response.json();
         
         // Buscar dados do usuário usando o email
-        const userResponse = await fetch(`http://localhost:8080/usuarios/email/${email}`, {
+        const userResponse = await fetch(`http://localhost:8080/usuarios/search?email=${email}`, {
           headers: {
             'Authorization': `Bearer ${result.token}`
           }

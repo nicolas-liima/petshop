@@ -8,11 +8,12 @@ export default function CadastroPage() {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    senha: ''
+    senha: '',
+    tipoUsuario: 'CLIENTE'
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -33,7 +34,8 @@ export default function CadastroPage() {
         body: JSON.stringify({
           nome: formData.nome,
           email: formData.email,
-          senha: formData.senha
+          senha: formData.senha,
+          tipoUsuario: formData.tipoUsuario
         })
       });
 
@@ -42,7 +44,7 @@ export default function CadastroPage() {
         alert('Usuário cadastrado com sucesso!');
         console.log('Usuário criado:', result);
         // Limpar formulário após sucesso
-        setFormData({ nome: '', email: '', senha: '' });
+        setFormData({ nome: '', email: '', senha: '', tipoUsuario: 'CLIENTE' });
       } else {
         const errorData = await response.json();
         alert(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`);
@@ -116,6 +118,23 @@ export default function CadastroPage() {
                 value={formData.senha}
                 onChange={handleChange}
               />
+            </div>
+
+            <div>
+              <label htmlFor="tipoUsuario" className="block text-sm font-medium text-gray-700">
+                Tipo de Usuário
+              </label>
+              <select
+                id="tipoUsuario"
+                name="tipoUsuario"
+                required
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                value={formData.tipoUsuario}
+                onChange={handleChange}
+              >
+                <option value="CLIENTE">Cliente</option>
+                <option value="EMPREENDEDOR">Empreendedor</option>
+              </select>
             </div>
 
             <div>

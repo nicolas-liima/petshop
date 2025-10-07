@@ -3,15 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCarrinho } from '../contexts/CarrinhoContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    setIsMenuOpen(false);
-  };
+  const { isAuthenticated, user } = useAuth();
+  const { quantidadeTotal } = useCarrinho();
 
   return (
     <nav className="bg-white shadow-lg">
@@ -34,20 +31,25 @@ export default function Navbar() {
                   Produtos
                 </Link>
                 <Link
-                    href="/pedidos"
-                    className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                  >
-                    Carrinho
-                  </Link>
+                  href="/loja"
+                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Loja
+                </Link>
+                <Link
+                  href="/carrinho"
+                  className="relative text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Carrinho
+                  {quantidadeTotal > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {quantidadeTotal}
+                    </span>
+                  )}
+                </Link>
                 <span className="text-gray-700 px-4 py-2 text-sm font-medium">
                   Olá, {user?.nome}
                 </span>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Logout
-                </button>
               </>
             ) : (
               <Link
@@ -90,21 +92,27 @@ export default function Navbar() {
                     Produtos
                   </Link>
                   <Link
-                      href="/pedidos"
-                      className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Carrinho
-                    </Link>
+                    href="/loja"
+                    className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Loja
+                  </Link>
+                  <Link
+                    href="/carrinho"
+                    className="relative block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Carrinho
+                    {quantidadeTotal > 0 && (
+                      <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {quantidadeTotal}
+                      </span>
+                    )}
+                  </Link>
                   <div className="block text-gray-700 px-3 py-2 text-base font-medium">
                     Olá, {user?.nome}
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
-                  >
-                    Logout
-                  </button>
                 </>
               ) : (
                 <Link
