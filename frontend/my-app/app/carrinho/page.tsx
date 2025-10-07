@@ -30,7 +30,7 @@ export default function CarrinhoPage() {
       const sucesso = await finalizarPedido();
       if (sucesso) {
         alert('Pedido finalizado com sucesso!');
-        router.push('/pedidos');
+        router.push('/');
       } else {
         alert('Erro ao finalizar pedido. Tente novamente.');
       }

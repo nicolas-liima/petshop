@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Produto {
   id: number;
@@ -24,24 +25,27 @@ export default function PedidosPage() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [usuarioId, setUsuarioId] = useState<number | null>(null);
+  const { user, token } = useAuth();
 
   useEffect(() => {
-    // Por enquanto, vamos usar um ID fixo de usuário
-    // Em uma implementação real, isso viria do contexto de autenticação
-    const userId = 1; // Substitua pela lógica de autenticação real
-    setUsuarioId(userId);
-    carregarPedidos(userId);
-  }, []);
+    if (user?.id) {
+      carregarPedidos(user.id);
+    }
+  }, [user]);
 
   const carregarPedidos = async (userId: number) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8080/pedidos?usuarioId=${userId}`);
+      const response = await fetch(`http://localhost:8080/pedidos?usuarioId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (response.ok) {
         const data = await response.json();
         setPedidos(data);
+        setError('');
       } else {
         setError('Erro ao carregar pedidos');
       }
@@ -65,8 +69,8 @@ export default function PedidosPage() {
 
       if (response.ok) {
         alert('Pedido excluído com sucesso!');
-        if (usuarioId) {
-          carregarPedidos(usuarioId); // Recarregar a lista
+        if (user?.id) {
+          carregarPedidos(user.id); // Recarregar a lista
         }
       } else {
         alert('Erro ao excluir pedido');

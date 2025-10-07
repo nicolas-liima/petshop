@@ -2,13 +2,20 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useCarrinho } from '../contexts/CarrinhoContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+  const { isAuthenticated, user, logout } = useAuth();
   const { quantidadeTotal } = useCarrinho();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
     <nav className="bg-white shadow-lg">
@@ -50,6 +57,12 @@ export default function Navbar() {
                 <span className="text-gray-700 px-4 py-2 text-sm font-medium">
                   Olá, {user?.nome}
                 </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-700 hover:text-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Sair
+                </button>
               </>
             ) : (
               <Link
@@ -113,6 +126,15 @@ export default function Navbar() {
                   <div className="block text-gray-700 px-3 py-2 text-base font-medium">
                     Olá, {user?.nome}
                   </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-base font-medium w-full text-left"
+                  >
+                    Sair
+                  </button>
                 </>
               ) : (
                 <Link

@@ -102,7 +102,7 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
 
   const finalizarPedido = async (): Promise<boolean> => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       if (!token) {
         alert('Você precisa estar logado para finalizar o pedido');
         return false;
