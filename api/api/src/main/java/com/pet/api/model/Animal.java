@@ -48,4 +48,12 @@ public class Animal {
 
     @Enumerated(EnumType.STRING)
     private StatusAnimal status;
+
+    //Adoção animal
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario adotante;
+
+    @Column(name = "url_imagem")
+    private String urlImagem;
 }

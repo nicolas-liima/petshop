@@ -23,3 +23,4 @@ public class ItemPedido {
 
     private BigDecimal subtotal;
 }
+
