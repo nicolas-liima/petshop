@@ -5,13 +5,13 @@ import com.pet.api.dto.usuario.UsuarioRequestDTO;
 import com.pet.api.dto.usuario.UsuarioResponseDTO;
 import com.pet.api.model.Animal;
 import com.pet.api.model.Usuario;
+import com.pet.api.service.AnimalService; 
 import com.pet.api.service.UsuarioService;
 import jakarta.validation.Valid;
-
-import org.h2.security.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +23,10 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    // INJETANDO O ANIMALSERVICE 
+    @Autowired
+    private AnimalService animalService;
 
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> criarNovoUsuario(@Valid @RequestBody UsuarioRequestDTO usuarioRequest) {
@@ -55,18 +59,15 @@ public class UsuarioController {
         usuarioService.deletarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/meus-animais")
-    public ResponseEntity<List<AnimalResponseDTO>> listarMinhasAdocoes(AuthenticationException authentication) {
-        // 1. Pega o usuário logado a partir do token
+    // --- CORREÇÃO 2: TIPO DO PARÂMETRO CORRIGIDO ---
+    public ResponseEntity<List<AnimalResponseDTO>> listarMinhasAdocoes(Authentication authentication) {
         Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-
-        // 2. Busca os animais adotados por ele
         List<Animal> animaisAdotados = animalService.listarPorAdotante(usuarioLogado.getId());
-
-        // 3. Converte para a lista de DTOs
         List<AnimalResponseDTO> dtos = animaisAdotados.stream()
-                 .map(AnimalResponseDTO::new)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos)
+               .map(AnimalResponseDTO::new)
+               .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
 }

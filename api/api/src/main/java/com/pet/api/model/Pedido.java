@@ -2,9 +2,7 @@ package com.pet.api.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name = "Pedido")
@@ -25,5 +23,4 @@ public class Pedido {
 
     @Enumerated(EnumType.STRING)
     private StatusPedido status = StatusPedido.PENDENTE;
-
 }
