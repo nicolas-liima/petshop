@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AnimalRepository extends JpaRepository<Animal, Long> { 
     List<Animal> findAllByStatus(StatusAnimal status);
+    List<Animal> findAllByAdotanteId(Long usuarioId);
 }
