@@ -36,7 +36,7 @@ export default function PedidosPage() {
   const carregarPedidos = async (userId: number) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8080/pedidos?usuarioId=${userId}`, {
+      const response = await fetch('http://localhost:8080/pedidos/meus', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -65,6 +65,9 @@ export default function PedidosPage() {
     try {
       const response = await fetch(`http://localhost:8080/pedidos/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (response.ok) {

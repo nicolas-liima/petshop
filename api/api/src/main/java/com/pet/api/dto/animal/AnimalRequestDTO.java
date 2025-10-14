@@ -37,9 +37,5 @@ public class AnimalRequestDTO {
     @NotBlank(message = "A descrição do pet não pode estar em branco.")
     private String descricao;
 
-    @NotNull(message = "O campo 'vacinado' é obrigatório.")
-    private Boolean vacinado;
 
-    @NotNull(message = "O campo 'castrado' é obrigatório.")
-    private Boolean castrado;
 }

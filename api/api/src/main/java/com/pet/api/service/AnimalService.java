@@ -50,8 +50,8 @@ public class AnimalService {
         novoAnimal.setSexo(dto.getSexo());
         novoAnimal.setTamanho(dto.getTamanho());
         novoAnimal.setDescricao(dto.getDescricao());
-        novoAnimal.setVacinado(dto.getVacinado());
-        novoAnimal.setCastrado(dto.getCastrado());
+        novoAnimal.setVacinado(false); // Valor padrão
+        novoAnimal.setCastrado(false); // Valor padrão
         novoAnimal.setStatus(StatusAnimal.DISPONIVEL);
         return animalRepository.save(novoAnimal);
     }
@@ -67,7 +67,7 @@ public class AnimalService {
         }
         animal.setStatus(StatusAnimal.ADOTADO);
         animal.setAdotante(usuario);
-        return animal;
+        return animalRepository.save(animal);
     }
 
     @Transactional
@@ -81,8 +81,13 @@ public class AnimalService {
         animal.setSexo(dto.getSexo());
         animal.setTamanho(dto.getTamanho());
         animal.setDescricao(dto.getDescricao());
-        animal.setVacinado(dto.getVacinado());
-        animal.setCastrado(dto.getCastrado());
+        // Manter valores existentes para vacinado e castrado se não fornecidos
+        if (animal.getVacinado() == null) {
+            animal.setVacinado(false);
+        }
+        if (animal.getCastrado() == null) {
+            animal.setCastrado(false);
+        }
         return animal;
     }
 
