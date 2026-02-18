@@ -34,8 +34,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.GET, "/produtos","/produtos/{id}").permitAll()
                         .requestMatchers("/produtos/**", "/pedidos/**").authenticated()
-                        .requestMatchers("/h2-console/**").permitAll() // Console H2 público
-                        .anyRequest().authenticated() // Demais rotas protegidas
+                        .requestMatchers("/agendamentos/**").authenticated()
+                        .requestMatchers("/vacinas/**").authenticated()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
