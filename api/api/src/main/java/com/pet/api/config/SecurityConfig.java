@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/vacinas/**").authenticated()
                         .requestMatchers("/funcionarios/**").authenticated()
                         .requestMatchers("/veterinarios/**").authenticated()
+                        .requestMatchers("/prontuarios/**").authenticated()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
