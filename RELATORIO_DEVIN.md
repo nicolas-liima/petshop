@@ -1,8 +1,11 @@
-# Relatorio de Implementacao - Agendamentos PetShop
+# Relatorio de Implementacao - PetShop API
 
 ## Resumo
 
-Foram implementadas 3 funcionalidades de agendamento de forma sequencial e atomica na branch `GabrielDEV`.
+Foram implementadas 5 funcionalidades de forma sequencial e atomica na branch `GabrielDEV`:
+- 3 funcionalidades de Agendamento (Vacinas, Banho/Tosa, Consultas)
+- 1 funcionalidade de Historico Medico / Prontuario do Pet
+- 1 funcionalidade de Cadastro Rigoroso de Profissionais
 
 ---
 
@@ -181,8 +184,93 @@ curl -X PATCH http://localhost:8080/agendamentos/consultas/1/cancelar -H "Author
 
 ---
 
+## 4. Historico Medico e Visualizacao do Pet (Prontuario)
+
+### Arquivos Criados
+- `api/api/src/main/java/com/pet/api/dto/prontuario/HistoricoItemDTO.java`
+- `api/api/src/main/java/com/pet/api/dto/prontuario/ProntuarioResponseDTO.java`
+- `api/api/src/main/java/com/pet/api/service/ProntuarioService.java`
+- `api/api/src/main/java/com/pet/api/controller/ProntuarioController.java`
+
+### Arquivos Alterados
+- `api/api/src/main/java/com/pet/api/config/SecurityConfig.java` (adicionada rota /prontuarios/**)
+
+### Regras de Negocio
+- Validacao de existencia do Pet (retorna 404 se nao encontrado)
+- Juncao (join) de todas as tabelas de agendamento vinculadas ao Pet: Vacinas, Consultas e Banho/Tosa
+- Dados ordenados cronologicamente do mais recente para o mais antigo
+- Se o Pet existir mas nao tiver historico, retorna array vazio com 200 OK (sem erro)
+- Cada item do historico inclui: tipo (VACINA/CONSULTA/BANHO_TOSA), data/hora, descricao, profissional, status e detalhes
+
+### Comandos para Testar
+
+```bash
+# Prontuario com historico completo (vacinas + consultas + banho/tosa)
+curl http://localhost:8080/prontuarios/animal/1 -H "Authorization: Bearer <TOKEN>"
+
+# Erro - Animal inexistente (404)
+curl http://localhost:8080/prontuarios/animal/999 -H "Authorization: Bearer <TOKEN>"
+
+# Animal sem historico (200 OK, array vazio)
+curl http://localhost:8080/prontuarios/animal/2 -H "Authorization: Bearer <TOKEN>"
+```
+
+---
+
+## 5. Cadastro Rigoroso de Profissionais
+
+### Arquivos Criados
+- `api/api/src/main/java/com/pet/api/dto/profissional/ProfissionalRequestDTO.java`
+- `api/api/src/main/java/com/pet/api/dto/profissional/ProfissionalResponseDTO.java`
+- `api/api/src/main/java/com/pet/api/service/FuncionarioService.java`
+
+### Arquivos Alterados
+- `api/api/src/main/java/com/pet/api/model/Funcionario.java` (adicionados campos cpf, crmv, email com unique constraints)
+- `api/api/src/main/java/com/pet/api/repository/FuncionarioRepository.java` (adicionados metodos findByCpf, findByCrmv, findByEmail)
+- `api/api/src/main/java/com/pet/api/controller/FuncionarioController.java` (refatorado para usar Service e DTOs)
+
+### Regras de Negocio
+- Diferenciacao por cargo: se o cargo for "Veterinario", o CRMV e obrigatorio (400 Bad Request se ausente)
+- Bloqueio de duplicidade de CPF (409 Conflict)
+- Bloqueio de duplicidade de Email (409 Conflict)
+- Bloqueio de duplicidade de CRMV (409 Conflict)
+- Status padrao "ativo" = true (nao precisa enviar no payload)
+- Validacao de email com formato valido
+
+### Comandos para Testar
+
+```bash
+# Cadastrar Tosador com sucesso
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Joao Silva","cargo":"Tosador","cpf":"12345678901","email":"joao@petshop.com"}'
+
+# Cadastrar Veterinario COM CRMV (sucesso)
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Dr. Carlos","cargo":"Veterinario","cpf":"98765432100","crmv":"CRMV-SP-12345","email":"carlos@petshop.com"}'
+
+# Erro - Veterinario SEM CRMV (400)
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Dra. Ana","cargo":"Veterinario","cpf":"11122233344","email":"ana@petshop.com"}'
+
+# Erro - CPF duplicado (409)
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Joao Duplicado","cargo":"Banhista","cpf":"12345678901","email":"joao2@petshop.com"}'
+
+# Erro - Email duplicado (409)
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Maria Nova","cargo":"Banhista","cpf":"55566677788","email":"joao@petshop.com"}'
+
+# Erro - CRMV duplicado (409)
+curl -X POST http://localhost:8080/funcionarios -H "Content-Type: application/json" -H "Authorization: Bearer <TOKEN>" -d '{"nome":"Dr. Pedro","cargo":"Veterinario","cpf":"99988877766","crmv":"CRMV-SP-12345","email":"pedro@petshop.com"}'
+
+# Listar todos os profissionais
+curl http://localhost:8080/funcionarios -H "Authorization: Bearer <TOKEN>"
+
+# Buscar por ID
+curl http://localhost:8080/funcionarios/1 -H "Authorization: Bearer <TOKEN>"
+```
+
+---
+
 ## Commits Realizados (branch GabrielDEV)
 
 1. `feat: implementa agendamento de vacinas com validacoes de estoque, data futura e IDs`
 2. `feat: implementa agendamento de banho e tosa com validacao de disponibilidade e bloqueio de double booking`
 3. `feat: implementa agendamento de consultas veterinarias com validacao de veterinario ativo e agenda livre`
+4. `feat: implementa historico medico e prontuario do pet com juncao de vacinas, consultas e banho/tosa ordenados cronologicamente`
+5. `feat: implementa cadastro rigoroso de profissionais com validacao de CRMV para veterinarios e bloqueio de duplicidade de CPF, email e CRMV`
