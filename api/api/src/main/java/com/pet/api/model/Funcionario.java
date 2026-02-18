@@ -23,6 +23,15 @@ public class Funcionario {
     @Column(nullable = false)
     private String cargo;
 
+    @Column(nullable = false, unique = true)
+    private String cpf;
+
+    @Column(unique = true)
+    private String crmv;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private Boolean ativo;
 }

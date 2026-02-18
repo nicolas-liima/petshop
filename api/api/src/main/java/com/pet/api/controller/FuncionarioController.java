@@ -1,8 +1,9 @@
 package com.pet.api.controller;
 
-import com.pet.api.exception.ResourceNotFoundException;
+import com.pet.api.dto.profissional.ProfissionalRequestDTO;
+import com.pet.api.dto.profissional.ProfissionalResponseDTO;
 import com.pet.api.model.Funcionario;
-import com.pet.api.repository.FuncionarioRepository;
+import com.pet.api.service.FuncionarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,30 +12,36 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/funcionarios")
 public class FuncionarioController {
 
     @Autowired
-    private FuncionarioRepository funcionarioRepository;
+    private FuncionarioService funcionarioService;
 
     @PostMapping
-    public ResponseEntity<Funcionario> cadastrar(@RequestBody @Valid Funcionario funcionario, UriComponentsBuilder uriBuilder) {
-        Funcionario novoFuncionario = funcionarioRepository.save(funcionario);
+    public ResponseEntity<ProfissionalResponseDTO> cadastrar(
+            @RequestBody @Valid ProfissionalRequestDTO dto,
+            UriComponentsBuilder uriBuilder) {
+        Funcionario novoFuncionario = funcionarioService.cadastrar(dto);
         URI uri = uriBuilder.path("/funcionarios/{id}").buildAndExpand(novoFuncionario.getId()).toUri();
-        return ResponseEntity.created(uri).body(novoFuncionario);
+        return ResponseEntity.created(uri).body(new ProfissionalResponseDTO(novoFuncionario));
     }
 
     @GetMapping
-    public ResponseEntity<List<Funcionario>> listar() {
-        return ResponseEntity.ok(funcionarioRepository.findAll());
+    public ResponseEntity<List<ProfissionalResponseDTO>> listar() {
+        List<ProfissionalResponseDTO> funcionarios = funcionarioService.listarTodos()
+                .stream()
+                .map(ProfissionalResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(funcionarios);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Funcionario> buscarPorId(@PathVariable Long id) {
-        Funcionario funcionario = funcionarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionario nao encontrado com o id: " + id));
-        return ResponseEntity.ok(funcionario);
+    public ResponseEntity<ProfissionalResponseDTO> buscarPorId(@PathVariable Long id) {
+        Funcionario funcionario = funcionarioService.buscarPorId(id);
+        return ResponseEntity.ok(new ProfissionalResponseDTO(funcionario));
     }
 }
