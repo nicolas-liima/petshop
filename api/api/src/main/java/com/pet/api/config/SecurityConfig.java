@@ -33,11 +33,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/login", "/usuarios", "/usuarios/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/produtos","/produtos/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/animais", "/animais/{id}").permitAll()
+                        .requestMatchers("/animais/**").authenticated()
                         .requestMatchers("/produtos/**", "/pedidos/**").authenticated()
-                        .requestMatchers("/animais/**").authenticated() // Outras operações de animais requerem autenticação
-                        .requestMatchers("/h2-console/**").permitAll() // Console H2 público
-                        .anyRequest().authenticated() // Demais rotas protegidas
+                        .requestMatchers("/agendamentos/**").authenticated()
+                        .requestMatchers("/vacinas/**").authenticated()
+                        .requestMatchers("/funcionarios/**").authenticated()
+                        .requestMatchers("/veterinarios/**").authenticated()
+                        .requestMatchers("/prontuarios/**").authenticated()
+                        .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
