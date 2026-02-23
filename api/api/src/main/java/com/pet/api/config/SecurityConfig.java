@@ -31,16 +31,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/login", "/usuarios").permitAll()
+                        .requestMatchers("/auth/login", "/usuarios", "/usuarios/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/produtos","/produtos/{id}").permitAll()
+                        .requestMatchers("/animais/**").authenticated()
                         .requestMatchers("/produtos/**", "/pedidos/**").authenticated()
                         .requestMatchers("/agendamentos/**").authenticated()
                         .requestMatchers("/vacinas/**").authenticated()
                         .requestMatchers("/funcionarios/**").authenticated()
                         .requestMatchers("/veterinarios/**").authenticated()
                         .requestMatchers("/prontuarios/**").authenticated()
-                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -50,7 +51,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
         

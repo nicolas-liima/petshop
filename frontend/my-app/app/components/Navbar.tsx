@@ -44,6 +44,18 @@ export default function Navbar() {
                   Loja
                 </Link>
                 <Link
+                  href="/animais"
+                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Animais
+                </Link>
+                <Link
+                  href="/meus-animais"
+                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Meus Animais
+                </Link>
+                <Link
                   href="/carrinho"
                   className="relative text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
@@ -110,6 +122,20 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Loja
+                  </Link>
+                  <Link
+                    href="/animais"
+                    className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Animais
+                  </Link>
+                  <Link
+                    href="/meus-animais"
+                    className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Meus Animais
                   </Link>
                   <Link
                     href="/carrinho"

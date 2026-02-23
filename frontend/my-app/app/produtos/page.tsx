@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Produto {
   id: number;
@@ -13,6 +14,7 @@ interface Produto {
 }
 
 export default function ProdutosPage() {
+  const { token } = useAuth();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,13 +50,24 @@ export default function ProdutosPage() {
     try {
       const response = await fetch(`http://localhost:8080/produtos/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (response.ok) {
         alert('Produto excluído com sucesso!');
         carregarProdutos(); // Recarregar a lista
       } else {
-        alert('Erro ao excluir produto');
+        // Tentar ler a resposta de erro apenas se houver conteúdo
+        let errorMessage = 'Erro ao excluir produto';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Ignorar erro de parse se não houver JSON
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       console.error('Erro na requisição:', error);

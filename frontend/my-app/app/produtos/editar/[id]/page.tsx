@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface Produto {
   id: number;
@@ -16,6 +17,7 @@ interface Produto {
 export default function EditarProdutoPage() {
   const params = useParams();
   const router = useRouter();
+  const { token } = useAuth();
   const produtoId = params.id as string;
   
   const [formData, setFormData] = useState({
@@ -73,6 +75,7 @@ export default function EditarProdutoPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           nome: formData.nome,
@@ -88,8 +91,15 @@ export default function EditarProdutoPage() {
         // Redirecionar para lista de produtos
         router.push('/produtos');
       } else {
-        const errorData = await response.json();
-        alert(`Erro ao atualizar: ${errorData.message || 'Erro desconhecido'}`);
+        // Tentar ler a resposta de erro apenas se houver conteúdo
+        let errorMessage = 'Erro ao atualizar produto';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Ignorar erro de parse se não houver JSON
+        }
+        alert(errorMessage);
       }
     } catch (error) {
       console.error('Erro na requisição:', error);
