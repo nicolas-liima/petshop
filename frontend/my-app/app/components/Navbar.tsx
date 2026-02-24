@@ -32,6 +32,12 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <Link
+                  href="/vacinas"
+                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Vacinas
+                </Link>
+                <Link
                   href="/produtos"
                   className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
@@ -109,6 +115,13 @@ export default function Navbar() {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {isAuthenticated ? (
                 <>
+                  <Link
+                    href="/vacinas"
+                    className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Vacinas
+                  </Link>
                   <Link
                     href="/produtos"
                     className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
