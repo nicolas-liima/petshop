@@ -163,16 +163,24 @@ export default function AgendarConsultaPage() {
           ) : vetsAtivos.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600 mb-4">
-                Não há veterinários ativos cadastrados. Cadastre um veterinário na API antes de
-                agendar.
+                Não há veterinários ativos. Cadastre um na área de veterinários (menu ou botão abaixo).
               </p>
-              <button
-                type="button"
-                onClick={() => router.push(`/animais/${animalId}`)}
-                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Voltar ao animal
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  type="button"
+                  onClick={() => router.push('/veterinarios/cadastro')}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                >
+                  Cadastrar veterinário
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/animais/${animalId}`)}
+                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Voltar ao animal
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
