@@ -32,6 +32,18 @@ interface AgendamentoVacina {
   status: 'AGENDADO' | 'REALIZADO' | 'CANCELADO';
 }
 
+interface AgendamentoConsulta {
+  id: number;
+  animalId: number;
+  animalNome: string;
+  veterinarioId: number;
+  veterinarioNome: string;
+  veterinarioEspecialidade: string;
+  dataHora: string;
+  motivo: string;
+  status: 'AGENDADO' | 'REALIZADO' | 'CANCELADO';
+}
+
 export default function AnimalDetalhesPage() {
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,8 +51,11 @@ export default function AnimalDetalhesPage() {
   const [adotando, setAdotando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
   const [agendamentosVacina, setAgendamentosVacina] = useState<AgendamentoVacina[]>([]);
-  const [loadingAgendamentos, setLoadingAgendamentos] = useState(false);
-  const [errorAgendamentos, setErrorAgendamentos] = useState('');
+  const [loadingAgendamentosVacina, setLoadingAgendamentosVacina] = useState(false);
+  const [errorAgendamentosVacina, setErrorAgendamentosVacina] = useState('');
+  const [agendamentosConsulta, setAgendamentosConsulta] = useState<AgendamentoConsulta[]>([]);
+  const [loadingConsultas, setLoadingConsultas] = useState(false);
+  const [errorConsultas, setErrorConsultas] = useState('');
   const { isAuthenticated, token } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -70,7 +85,7 @@ export default function AnimalDetalhesPage() {
 
   const carregarAgendamentosVacina = async () => {
     try {
-      setLoadingAgendamentos(true);
+      setLoadingAgendamentosVacina(true);
       const response = await fetch(
         `http://localhost:8080/agendamentos/vacinas/animal/${animalId}`
       );
@@ -78,15 +93,37 @@ export default function AnimalDetalhesPage() {
       if (response.ok) {
         const data = await response.json();
         setAgendamentosVacina(data);
-        setErrorAgendamentos('');
+        setErrorAgendamentosVacina('');
       } else {
-        setErrorAgendamentos('Não foi possível carregar os agendamentos de vacina.');
+        setErrorAgendamentosVacina('Não foi possível carregar os agendamentos de vacina.');
       }
     } catch (err) {
       console.error('Erro ao carregar agendamentos de vacina:', err);
-      setErrorAgendamentos('Não foi possível carregar os agendamentos de vacina.');
+      setErrorAgendamentosVacina('Não foi possível carregar os agendamentos de vacina.');
     } finally {
-      setLoadingAgendamentos(false);
+      setLoadingAgendamentosVacina(false);
+    }
+  };
+
+  const carregarAgendamentosConsulta = async () => {
+    try {
+      setLoadingConsultas(true);
+      const response = await fetch(
+        `http://localhost:8080/agendamentos/consultas/animal/${animalId}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setAgendamentosConsulta(data);
+        setErrorConsultas('');
+      } else {
+        setErrorConsultas('Não foi possível carregar as consultas agendadas.');
+      }
+    } catch (err) {
+      console.error('Erro ao carregar consultas:', err);
+      setErrorConsultas('Não foi possível carregar as consultas agendadas.');
+    } finally {
+      setLoadingConsultas(false);
     }
   };
 
@@ -94,6 +131,7 @@ export default function AnimalDetalhesPage() {
     if (animalId) {
       carregarAnimal();
       carregarAgendamentosVacina();
+      carregarAgendamentosConsulta();
     }
   }, [animalId]);
 
@@ -198,6 +236,40 @@ export default function AnimalDetalhesPage() {
     } catch (err) {
       console.error('Erro ao cancelar agendamento de vacina:', err);
       alert('Erro ao cancelar agendamento. Tente novamente.');
+    }
+  };
+
+  const handleCancelarAgendamentoConsulta = async (agendamentoId: number) => {
+    if (!isAuthenticated || !token) {
+      router.push('/login');
+      return;
+    }
+
+    const confirmar = window.confirm(
+      'Tem certeza que deseja cancelar este agendamento de consulta?'
+    );
+    if (!confirmar) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/agendamentos/consultas/${agendamentoId}/cancelar`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert('Consulta cancelada com sucesso!');
+        carregarAgendamentosConsulta();
+      } else {
+        alert('Erro ao cancelar consulta. Tente novamente.');
+      }
+    } catch (err) {
+      console.error('Erro ao cancelar consulta:', err);
+      alert('Erro ao cancelar consulta. Tente novamente.');
     }
   };
 
@@ -353,11 +425,11 @@ export default function AnimalDetalhesPage() {
                   )}
                 </div>
 
-                {loadingAgendamentos ? (
+                {loadingAgendamentosVacina ? (
                   <p className="text-gray-600">Carregando agendamentos de vacina...</p>
-                ) : errorAgendamentos ? (
+                ) : errorAgendamentosVacina ? (
                   <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
-                    {errorAgendamentos}
+                    {errorAgendamentosVacina}
                   </div>
                 ) : agendamentosVacina.length === 0 ? (
                   <p className="text-gray-600">
@@ -418,6 +490,86 @@ export default function AnimalDetalhesPage() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Consultas veterinárias */}
+            <div className="mt-10 pt-8 border-t border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Consultas veterinárias</h2>
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/animais/${animalId}/agendar-consulta`)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
+                  >
+                    Agendar consulta
+                  </button>
+                )}
+              </div>
+
+              {loadingConsultas ? (
+                <p className="text-gray-600">Carregando consultas...</p>
+              ) : errorConsultas ? (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
+                  {errorConsultas}
+                </div>
+              ) : agendamentosConsulta.length === 0 ? (
+                <p className="text-gray-600">Nenhuma consulta agendada para este animal.</p>
+              ) : (
+                <div className="space-y-3">
+                  {agendamentosConsulta.map((ag) => (
+                    <div
+                      key={ag.id}
+                      className="flex items-start justify-between bg-gray-50 border border-gray-200 rounded-lg p-4"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {ag.veterinarioNome}
+                          <span className="text-gray-600 font-normal">
+                            {' '}
+                            · {ag.veterinarioEspecialidade}
+                          </span>
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {new Date(ag.dataHora).toLocaleString('pt-BR', {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                          })}
+                        </p>
+                        <p className="text-sm text-gray-700 mt-2">
+                          <span className="font-medium text-gray-700">Motivo:</span> {ag.motivo}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0 ml-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            ag.status === 'AGENDADO'
+                              ? 'bg-blue-100 text-blue-800'
+                              : ag.status === 'REALIZADO'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {ag.status === 'AGENDADO'
+                            ? 'Agendado'
+                            : ag.status === 'REALIZADO'
+                              ? 'Realizado'
+                              : 'Cancelado'}
+                        </span>
+                        {ag.status === 'AGENDADO' && isAuthenticated && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancelarAgendamentoConsulta(ag.id)}
+                            className="mt-2 inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                          >
+                            Cancelar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Descrição */}

@@ -9,6 +9,7 @@ interface Vacina {
   id: number;
   nome: string;
   fabricante: string;
+  estoque: number;
 }
 
 export default function AgendarVacinaPage() {
@@ -173,11 +174,19 @@ export default function AgendarVacinaPage() {
                 >
                   <option value="">Selecione uma vacina</option>
                   {vacinas.map((vacina) => (
-                    <option key={vacina.id} value={vacina.id}>
+                    <option
+                      key={vacina.id}
+                      value={vacina.id}
+                      disabled={vacina.estoque <= 0}
+                    >
                       {vacina.nome} - {vacina.fabricante}
+                      {vacina.estoque <= 0 ? ' (sem estoque)' : ''}
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Vacinas sem estoque aparecem desativadas para agendamento.
+                </p>
               </div>
 
               <div>

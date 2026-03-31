@@ -38,6 +38,12 @@ export default function Navbar() {
                   Vacinas
                 </Link>
                 <Link
+                  href="/agendamentos/consultas"
+                  className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Consultas
+                </Link>
+                <Link
                   href="/produtos"
                   className="text-gray-700 hover:text-indigo-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
@@ -121,6 +127,13 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Vacinas
+                  </Link>
+                  <Link
+                    href="/agendamentos/consultas"
+                    className="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Consultas
                   </Link>
                   <Link
                     href="/produtos"
