@@ -96,6 +96,62 @@ public class AgendamentoBanhoTosaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o id: " + animalId));
         return agendamentoRepository.findAllByAnimalId(animalId);
     }
+    @Transactional
+    public AgendamentoBanhoTosa editar(Long id, AgendamentoBanhoTosaRequestDTO dto) {
+        AgendamentoBanhoTosa agendamento = buscarPorId(id);
+
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento cancelado.");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.REALIZADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento ja realizado.");
+        }
+
+        Animal animal = animalRepository.findById(dto.getAnimalId())
+                .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o id: " + dto.getAnimalId()));
+
+        Funcionario funcionario = funcionarioRepository.findById(dto.getFuncionarioId())
+                .orElseThrow(() -> new ResourceNotFoundException("Funcionario nao encontrado com o id: " + dto.getFuncionarioId()));
+
+        if (!funcionario.getAtivo()) {
+            throw new BusinessException("O funcionario '" + funcionario.getNome() + "' nao esta ativo.");
+        }
+
+        if (dto.getDataHora().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("A data e hora do agendamento devem ser futuras. Data informada: " + dto.getDataHora());
+        }
+
+        int duracaoMinutos = estimarDuracao(dto.getTipoServico());
+        LocalDateTime inicioNovo = dto.getDataHora();
+        LocalDateTime fimNovo = inicioNovo.plusMinutes(duracaoMinutos);
+
+        List<AgendamentoBanhoTosa> agendamentosExistentes = agendamentoRepository
+                .findAllByFuncionarioIdAndStatus(dto.getFuncionarioId(), StatusAgendamento.AGENDADO);
+
+        for (AgendamentoBanhoTosa existente : agendamentosExistentes) {
+            if (existente.getId().equals(id)) continue;
+
+            LocalDateTime inicioExistente = existente.getDataHora();
+            LocalDateTime fimExistente = inicioExistente.plusMinutes(existente.getDuracaoEstimadaMinutos());
+
+            boolean conflito = inicioNovo.isBefore(fimExistente) && fimNovo.isAfter(inicioExistente);
+
+            if (conflito) {
+                throw new ConflictException("Conflito de horario: o funcionario '" + funcionario.getNome()
+                        + "' ja possui um agendamento entre " + inicioExistente + " e " + fimExistente
+                        + ". Escolha outro horario ou funcionario.");
+            }
+        }
+
+        agendamento.setAnimal(animal);
+        agendamento.setFuncionario(funcionario);
+        agendamento.setDataHora(dto.getDataHora());
+        agendamento.setTipoServico(dto.getTipoServico());
+        agendamento.setDuracaoEstimadaMinutos(duracaoMinutos);
+
+        return agendamentoRepository.save(agendamento);
+    }
 
     @Transactional
     public AgendamentoBanhoTosa cancelar(Long id) {

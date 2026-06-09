@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Navbar from '../../../components/Navbar';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Navbar from "../../../components/Navbar";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface Vacina {
   id: number;
@@ -19,38 +19,38 @@ export default function AgendarVacinaPage() {
   const animalId = params.id;
 
   const [vacinas, setVacinas] = useState<Vacina[]>([]);
-  const [selectedVacinaId, setSelectedVacinaId] = useState('');
-  const [dataAgendamento, setDataAgendamento] = useState('');
-  const [observacoes, setObservacoes] = useState('');
+  const [selectedVacinaId, setSelectedVacinaId] = useState("");
+  const [dataAgendamento, setDataAgendamento] = useState("");
+  const [observacoes, setObservacoes] = useState("");
   const [loadingVacinas, setLoadingVacinas] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const carregarVacinas = async () => {
       try {
         setLoadingVacinas(true);
-        const response = await fetch('http://localhost:8080/vacinas', {
+        const response = await fetch("http://localhost:8080/vacinas", {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (response.ok) {
           const data = await response.json();
           setVacinas(data);
         } else {
-          setError('Não foi possível carregar a lista de vacinas.');
+          setError("Não foi possível carregar a lista de vacinas.");
         }
       } catch (err) {
-        console.error('Erro ao carregar vacinas:', err);
-        setError('Erro ao carregar vacinas. Tente novamente.');
+        console.error("Erro ao carregar vacinas:", err);
+        setError("Erro ao carregar vacinas. Tente novamente.");
       } finally {
         setLoadingVacinas(false);
       }
@@ -63,43 +63,49 @@ export default function AgendarVacinaPage() {
     e.preventDefault();
 
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     if (!animalId) {
-      setError('Animal inválido para agendamento.');
+      setError("Animal inválido para agendamento.");
       return;
     }
 
     setSubmitting(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:8080/agendamentos/vacinas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+      const response = await fetch(
+        "http://localhost:8080/agendamentos/vacinas",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            animalId: Number(animalId),
+            vacinaId: Number(selectedVacinaId),
+            dataAgendamento,
+            observacoes: observacoes || undefined,
+          }),
         },
-        body: JSON.stringify({
-          animalId: Number(animalId),
-          vacinaId: Number(selectedVacinaId),
-          dataAgendamento,
-          observacoes: observacoes || undefined
-        })
-      });
+      );
 
       if (response.ok) {
-        alert('Vacina agendada com sucesso!');
+        alert("Vacina agendada com sucesso!");
         router.push(`/animais/${animalId}`);
       } else {
         const errorText = await response.text();
-        setError(errorText || 'Erro ao agendar vacina. Verifique os dados e tente novamente.');
+        setError(
+          errorText ||
+            "Erro ao agendar vacina. Verifique os dados e tente novamente.",
+        );
       }
     } catch (err) {
-      console.error('Erro ao agendar vacina:', err);
-      setError('Erro ao agendar vacina. Tente novamente.');
+      console.error("Erro ao agendar vacina:", err);
+      setError("Erro ao agendar vacina. Tente novamente.");
     } finally {
       setSubmitting(false);
     }
@@ -149,7 +155,7 @@ export default function AgendarVacinaPage() {
                 Nenhuma vacina cadastrada. Cadastre uma vacina antes de agendar.
               </p>
               <button
-                onClick={() => router.push('/vacinas/cadastro')}
+                onClick={() => router.push("/vacinas/cadastro")}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
               >
                 Cadastrar Vacina
@@ -180,7 +186,7 @@ export default function AgendarVacinaPage() {
                       disabled={vacina.estoque <= 0}
                     >
                       {vacina.nome} - {vacina.fabricante}
-                      {vacina.estoque <= 0 ? ' (sem estoque)' : ''}
+                      {vacina.estoque <= 0 ? " (sem estoque)" : ""}
                     </option>
                   ))}
                 </select>
@@ -238,7 +244,7 @@ export default function AgendarVacinaPage() {
                   disabled={submitting}
                   className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors"
                 >
-                  {submitting ? 'Agendando...' : 'Agendar Vacina'}
+                  {submitting ? "Agendando..." : "Agendar Vacina"}
                 </button>
               </div>
             </form>
@@ -248,4 +254,3 @@ export default function AgendarVacinaPage() {
     </div>
   );
 }
-

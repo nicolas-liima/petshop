@@ -53,6 +53,13 @@ public class AgendamentoConsultaController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(agendamentos);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoConsultaResponseDTO> editar(
+            @PathVariable Long id,
+            @RequestBody @Valid AgendamentoConsultaRequestDTO dto) {
+        AgendamentoConsulta agendamento = agendamentoConsultaService.editar(id, dto);
+        return ResponseEntity.ok(new AgendamentoConsultaResponseDTO(agendamento));
+    }
 
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<AgendamentoConsultaResponseDTO> cancelar(@PathVariable Long id) {

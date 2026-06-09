@@ -4,7 +4,7 @@ import com.pet.api.model.Funcionario;
 import lombok.Getter;
 
 @Getter
-public class ProfissionalResponseDTO {
+public class  ProfissionalResponseDTO {
 
     private Long id;
     private String nome;

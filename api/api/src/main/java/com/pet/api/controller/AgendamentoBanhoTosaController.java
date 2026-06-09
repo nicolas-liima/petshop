@@ -54,6 +54,14 @@ public class AgendamentoBanhoTosaController {
         return ResponseEntity.ok(agendamentos);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoBanhoTosaResponseDTO> editar(
+            @PathVariable Long id,
+            @RequestBody @Valid AgendamentoBanhoTosaRequestDTO dto) {
+        AgendamentoBanhoTosa agendamento = agendamentoService.editar(id, dto);
+        return ResponseEntity.ok(new AgendamentoBanhoTosaResponseDTO(agendamento));
+    }
+
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<AgendamentoBanhoTosaResponseDTO> cancelar(@PathVariable Long id) {
         AgendamentoBanhoTosa agendamento = agendamentoService.cancelar(id);

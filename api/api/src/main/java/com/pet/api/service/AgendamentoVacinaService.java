@@ -76,6 +76,55 @@ public class AgendamentoVacinaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o id: " + animalId));
         return agendamentoVacinaRepository.findAllByAnimalId(animalId);
     }
+    @Transactional
+    public AgendamentoVacina editar(Long id, AgendamentoVacinaRequestDTO dto) {
+        AgendamentoVacina agendamento = buscarPorId(id);
+
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento cancelado.");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.REALIZADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento ja realizado.");
+        }
+
+        Animal animal = animalRepository.findById(dto.getAnimalId())
+                .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o id: " + dto.getAnimalId()));
+
+        Vacina novaVacina = vacinaRepository.findById(dto.getVacinaId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vacina nao encontrada com o id: " + dto.getVacinaId()));
+
+        if (dto.getDataAgendamento().isBefore(LocalDate.now())) {
+            throw new BusinessException("A data do agendamento deve ser uma data futura. Data informada: " + dto.getDataAgendamento());
+        }
+
+        if (dto.getDataAgendamento().isEqual(LocalDate.now())) {
+            throw new BusinessException("A data do agendamento deve ser uma data futura. Nao e permitido agendar para hoje.");
+        }
+
+        // Só mexe no estoque se a vacina mudou
+        Vacina vacinaAtual = agendamento.getVacina();
+        boolean vacinaMudou = !vacinaAtual.getId().equals(novaVacina.getId());
+
+        if (vacinaMudou) {
+            if (novaVacina.getEstoque() <= 0) {
+                throw new BusinessException("Vacina '" + novaVacina.getNome() + "' sem estoque disponivel.");
+            }
+            // Devolve estoque da vacina antiga e decrementa a nova
+            vacinaAtual.setEstoque(vacinaAtual.getEstoque() + 1);
+            vacinaRepository.save(vacinaAtual);
+
+            novaVacina.setEstoque(novaVacina.getEstoque() - 1);
+            vacinaRepository.save(novaVacina);
+        }
+
+        agendamento.setAnimal(animal);
+        agendamento.setVacina(novaVacina);
+        agendamento.setDataAgendamento(dto.getDataAgendamento());
+        agendamento.setObservacoes(dto.getObservacoes());
+
+        return agendamentoVacinaRepository.save(agendamento);
+    }
 
     @Transactional
     public AgendamentoVacina cancelar(Long id) {

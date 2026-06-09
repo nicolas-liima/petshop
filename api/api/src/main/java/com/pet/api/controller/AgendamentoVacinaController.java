@@ -53,10 +53,17 @@ public class AgendamentoVacinaController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(agendamentos);
     }
-
+    @PutMapping("/{id}")
+    public ResponseEntity<AgendamentoVacinaResponseDTO> editar(
+            @PathVariable Long id,
+            @RequestBody @Valid AgendamentoVacinaRequestDTO dto) {
+        AgendamentoVacina agendamento = agendamentoVacinaService.editar(id, dto);
+        return ResponseEntity.ok(new AgendamentoVacinaResponseDTO(agendamento));
+    }
     @PatchMapping("/{id}/cancelar")
     public ResponseEntity<AgendamentoVacinaResponseDTO> cancelar(@PathVariable Long id) {
         AgendamentoVacina agendamento = agendamentoVacinaService.cancelar(id);
         return ResponseEntity.ok(new AgendamentoVacinaResponseDTO(agendamento));
     }
+
 }

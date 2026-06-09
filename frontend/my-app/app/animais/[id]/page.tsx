@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
-import Navbar from '../../components/Navbar';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import Navbar from "../../components/Navbar";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Animal {
   id: number;
@@ -29,7 +29,7 @@ interface AgendamentoVacina {
   vacinaNome: string;
   dataAgendamento: string;
   observacoes?: string;
-  status: 'AGENDADO' | 'REALIZADO' | 'CANCELADO';
+  status: "AGENDADO" | "REALIZADO" | "CANCELADO";
 }
 
 interface AgendamentoConsulta {
@@ -41,7 +41,7 @@ interface AgendamentoConsulta {
   veterinarioEspecialidade: string;
   dataHora: string;
   motivo: string;
-  status: 'AGENDADO' | 'REALIZADO' | 'CANCELADO';
+  status: "AGENDADO" | "REALIZADO" | "CANCELADO";
 }
 
 interface AgendamentoBanhoTosa {
@@ -52,24 +52,31 @@ interface AgendamentoBanhoTosa {
   funcionarioNome: string;
   dataHora: string;
   tipoServico: string;
-  status: 'AGENDADO' | 'REALIZADO' | 'CANCELADO';
+  status: "AGENDADO" | "REALIZADO" | "CANCELADO";
 }
 
 export default function AnimalDetalhesPage() {
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [adotando, setAdotando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
-  const [agendamentosVacina, setAgendamentosVacina] = useState<AgendamentoVacina[]>([]);
-  const [loadingAgendamentosVacina, setLoadingAgendamentosVacina] = useState(false);
-  const [errorAgendamentosVacina, setErrorAgendamentosVacina] = useState('');
-  const [agendamentosConsulta, setAgendamentosConsulta] = useState<AgendamentoConsulta[]>([]);
+  const [agendamentosVacina, setAgendamentosVacina] = useState<
+    AgendamentoVacina[]
+  >([]);
+  const [loadingAgendamentosVacina, setLoadingAgendamentosVacina] =
+    useState(false);
+  const [errorAgendamentosVacina, setErrorAgendamentosVacina] = useState("");
+  const [agendamentosConsulta, setAgendamentosConsulta] = useState<
+    AgendamentoConsulta[]
+  >([]);
   const [loadingConsultas, setLoadingConsultas] = useState(false);
-  const [errorConsultas, setErrorConsultas] = useState('');
-  const [agendamentosBanhoTosa, setAgendamentosBanhoTosa] = useState<AgendamentoBanhoTosa[]>([]);
+  const [errorConsultas, setErrorConsultas] = useState("");
+  const [agendamentosBanhoTosa, setAgendamentosBanhoTosa] = useState<
+    AgendamentoBanhoTosa[]
+  >([]);
   const [loadingBanhoTosa, setLoadingBanhoTosa] = useState(false);
-  const [errorBanhoTosa, setErrorBanhoTosa] = useState('');
+  const [errorBanhoTosa, setErrorBanhoTosa] = useState("");
   const { isAuthenticated, token } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -83,15 +90,15 @@ export default function AnimalDetalhesPage() {
       if (response.ok) {
         const data = await response.json();
         setAnimal(data);
-        setError('');
+        setError("");
       } else if (response.status === 404) {
-        setError('Animal não encontrado');
+        setError("Animal não encontrado");
       } else {
-        setError('Animal não encontrado');
+        setError("Animal não encontrado");
       }
     } catch (error) {
-      console.error('Erro ao carregar animal:', error);
-      setError('Não foi possível carregar os dados do animal');
+      console.error("Erro ao carregar animal:", error);
+      setError("Não foi possível carregar os dados do animal");
     } finally {
       setLoading(false);
     }
@@ -101,19 +108,23 @@ export default function AnimalDetalhesPage() {
     try {
       setLoadingAgendamentosVacina(true);
       const response = await fetch(
-        `http://localhost:8080/agendamentos/vacinas/animal/${animalId}`
+        `http://localhost:8080/agendamentos/vacinas/animal/${animalId}`,
       );
 
       if (response.ok) {
         const data = await response.json();
         setAgendamentosVacina(data);
-        setErrorAgendamentosVacina('');
+        setErrorAgendamentosVacina("");
       } else {
-        setErrorAgendamentosVacina('Não foi possível carregar os agendamentos de vacina.');
+        setErrorAgendamentosVacina(
+          "Não foi possível carregar os agendamentos de vacina.",
+        );
       }
     } catch (err) {
-      console.error('Erro ao carregar agendamentos de vacina:', err);
-      setErrorAgendamentosVacina('Não foi possível carregar os agendamentos de vacina.');
+      console.error("Erro ao carregar agendamentos de vacina:", err);
+      setErrorAgendamentosVacina(
+        "Não foi possível carregar os agendamentos de vacina.",
+      );
     } finally {
       setLoadingAgendamentosVacina(false);
     }
@@ -123,19 +134,19 @@ export default function AnimalDetalhesPage() {
     try {
       setLoadingConsultas(true);
       const response = await fetch(
-        `http://localhost:8080/agendamentos/consultas/animal/${animalId}`
+        `http://localhost:8080/agendamentos/consultas/animal/${animalId}`,
       );
 
       if (response.ok) {
         const data = await response.json();
         setAgendamentosConsulta(data);
-        setErrorConsultas('');
+        setErrorConsultas("");
       } else {
-        setErrorConsultas('Não foi possível carregar as consultas agendadas.');
+        setErrorConsultas("Não foi possível carregar as consultas agendadas.");
       }
     } catch (err) {
-      console.error('Erro ao carregar consultas:', err);
-      setErrorConsultas('Não foi possível carregar as consultas agendadas.');
+      console.error("Erro ao carregar consultas:", err);
+      setErrorConsultas("Não foi possível carregar as consultas agendadas.");
     } finally {
       setLoadingConsultas(false);
     }
@@ -146,19 +157,19 @@ export default function AnimalDetalhesPage() {
       setLoadingBanhoTosa(true);
 
       const response = await fetch(
-        `http://localhost:8080/agendamentos/banho-tosa/animal/${animalId}`
+        `http://localhost:8080/agendamentos/banho-tosa/animal/${animalId}`,
       );
 
       if (response.ok) {
         const data = await response.json();
         setAgendamentosBanhoTosa(data);
-        setErrorBanhoTosa('');
+        setErrorBanhoTosa("");
       } else {
-        setErrorBanhoTosa('Não foi possível carregar banho e tosa.');
+        setErrorBanhoTosa("Não foi possível carregar banho e tosa.");
       }
     } catch (err) {
-      console.error('Erro banho e tosa:', err);
-      setErrorBanhoTosa('Erro ao carregar banho e tosa.');
+      console.error("Erro banho e tosa:", err);
+      setErrorBanhoTosa("Erro ao carregar banho e tosa.");
     } finally {
       setLoadingBanhoTosa(false);
     }
@@ -175,30 +186,33 @@ export default function AnimalDetalhesPage() {
 
   const handleAdotar = async () => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     try {
       setAdotando(true);
-      const response = await fetch(`http://localhost:8080/animais/${animalId}/adotar`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await fetch(
+        `http://localhost:8080/animais/${animalId}/adotar`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
       if (response.ok) {
         // Recarregar os dados do animal para mostrar o novo status
         await carregarAnimal();
-        alert('Animal adotado com sucesso!');
+        alert("Animal adotado com sucesso!");
       } else {
-        setError('Erro ao adotar animal. Tente novamente.');
+        setError("Erro ao adotar animal. Tente novamente.");
       }
     } catch (error) {
-      console.error('Erro ao adotar animal:', error);
-      setError('Erro ao adotar animal. Tente novamente.');
+      console.error("Erro ao adotar animal:", error);
+      setError("Erro ao adotar animal. Tente novamente.");
     } finally {
       setAdotando(false);
     }
@@ -210,34 +224,37 @@ export default function AnimalDetalhesPage() {
 
   const handleExcluir = async () => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const confirmacao = window.confirm(
-      `Tem certeza que deseja excluir o animal ${animal?.nome}? Esta ação não pode ser desfeita.`
+      `Tem certeza que deseja excluir o animal ${animal?.nome}? Esta ação não pode ser desfeita.`,
     );
 
     if (!confirmacao) return;
 
     try {
       setExcluindo(true);
-      const response = await fetch(`http://localhost:8080/animais/${animalId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(
+        `http://localhost:8080/animais/${animalId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       if (response.ok) {
-        alert('Animal excluído com sucesso!');
-        router.push('/animais');
+        alert("Animal excluído com sucesso!");
+        router.push("/animais");
       } else {
-        setError('Erro ao excluir animal. Tente novamente.');
+        setError("Erro ao excluir animal. Tente novamente.");
       }
     } catch (error) {
-      console.error('Erro ao excluir animal:', error);
-      setError('Erro ao excluir animal. Tente novamente.');
+      console.error("Erro ao excluir animal:", error);
+      setError("Erro ao excluir animal. Tente novamente.");
     } finally {
       setExcluindo(false);
     }
@@ -245,12 +262,12 @@ export default function AnimalDetalhesPage() {
 
   const handleCancelarAgendamentoVacina = async (agendamentoId: number) => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const confirmar = window.confirm(
-      'Tem certeza que deseja cancelar este agendamento de vacina?'
+      "Tem certeza que deseja cancelar este agendamento de vacina?",
     );
     if (!confirmar) return;
 
@@ -258,33 +275,33 @@ export default function AnimalDetalhesPage() {
       const response = await fetch(
         `http://localhost:8080/agendamentos/vacinas/${agendamentoId}/cancelar`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.ok) {
-        alert('Agendamento de vacina cancelado com sucesso!');
+        alert("Agendamento de vacina cancelado com sucesso!");
         carregarAgendamentosVacina();
       } else {
-        alert('Erro ao cancelar agendamento. Tente novamente.');
+        alert("Erro ao cancelar agendamento. Tente novamente.");
       }
     } catch (err) {
-      console.error('Erro ao cancelar agendamento de vacina:', err);
-      alert('Erro ao cancelar agendamento. Tente novamente.');
+      console.error("Erro ao cancelar agendamento de vacina:", err);
+      alert("Erro ao cancelar agendamento. Tente novamente.");
     }
   };
 
   const handleCancelarAgendamentoConsulta = async (agendamentoId: number) => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const confirmar = window.confirm(
-      'Tem certeza que deseja cancelar este agendamento de consulta?'
+      "Tem certeza que deseja cancelar este agendamento de consulta?",
     );
     if (!confirmar) return;
 
@@ -292,33 +309,33 @@ export default function AnimalDetalhesPage() {
       const response = await fetch(
         `http://localhost:8080/agendamentos/consultas/${agendamentoId}/cancelar`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
-        alert('Consulta cancelada com sucesso!');
+        alert("Consulta cancelada com sucesso!");
         carregarAgendamentosConsulta();
       } else {
-        alert('Erro ao cancelar consulta. Tente novamente.');
+        alert("Erro ao cancelar consulta. Tente novamente.");
       }
     } catch (err) {
-      console.error('Erro ao cancelar consulta:', err);
-      alert('Erro ao cancelar consulta. Tente novamente.');
+      console.error("Erro ao cancelar consulta:", err);
+      alert("Erro ao cancelar consulta. Tente novamente.");
     }
   };
 
   const handleCancelarBanhoTosa = async (id: number) => {
     if (!isAuthenticated || !token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     const confirmar = window.confirm(
-      'Tem certeza que deseja cancelar este banho e tosa?'
+      "Tem certeza que deseja cancelar este banho e tosa?",
     );
     if (!confirmar) return;
 
@@ -326,22 +343,22 @@ export default function AnimalDetalhesPage() {
       const response = await fetch(
         `http://localhost:8080/agendamentos/banho-tosa/${id}/cancelar`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
-        alert('Banho e tosa cancelado com sucesso!');
+        alert("Banho e tosa cancelado com sucesso!");
         carregarAgendamentosBanhoTosa();
       } else {
-        alert('Erro ao cancelar banho e tosa.');
+        alert("Erro ao cancelar banho e tosa.");
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao cancelar banho e tosa.');
+      alert("Erro ao cancelar banho e tosa.");
     }
   };
 
@@ -421,24 +438,31 @@ export default function AnimalDetalhesPage() {
           <div className="px-6 py-8 border-b border-gray-200">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{animal.nome}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {animal.nome}
+                </h1>
                 <div className="flex items-center space-x-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${animal.status === 'DISPONIVEL'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                    }`}>
-                    {animal.status === 'DISPONIVEL' ? 'Disponível para Adoção' : 'Já Adotado'}
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      animal.status === "DISPONIVEL"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {animal.status === "DISPONIVEL"
+                      ? "Disponível para Adoção"
+                      : "Já Adotado"}
                   </span>
                 </div>
               </div>
 
-              {animal.status === 'DISPONIVEL' && isAuthenticated && (
+              {animal.status === "DISPONIVEL" && isAuthenticated && (
                 <button
                   onClick={handleAdotar}
                   disabled={adotando}
                   className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors font-medium"
                 >
-                  {adotando ? 'Adotando...' : 'Adotar Este Animal'}
+                  {adotando ? "Adotando..." : "Adotar Este Animal"}
                 </button>
               )}
             </div>
@@ -488,7 +512,9 @@ export default function AnimalDetalhesPage() {
                   </h2>
                   {isAuthenticated && (
                     <button
-                      onClick={() => router.push(`/animais/${animalId}/agendar-vacina`)}
+                      onClick={() =>
+                        router.push(`/animais/${animalId}/agendar-vacina`)
+                      }
                       className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
                     >
                       Agendar Vacina
@@ -497,7 +523,9 @@ export default function AnimalDetalhesPage() {
                 </div>
 
                 {loadingAgendamentosVacina ? (
-                  <p className="text-gray-600">Carregando agendamentos de vacina...</p>
+                  <p className="text-gray-600">
+                    Carregando agendamentos de vacina...
+                  </p>
                 ) : errorAgendamentosVacina ? (
                   <div className="bg-red-50 border border-red-200 rounded-md p-4 text-sm text-red-700">
                     {errorAgendamentosVacina}
@@ -518,10 +546,10 @@ export default function AnimalDetalhesPage() {
                             {agendamento.vacinaNome}
                           </p>
                           <p className="text-sm text-gray-600">
-                            Data:{' '}
-                            {new Date(agendamento.dataAgendamento).toLocaleDateString(
-                              'pt-BR'
-                            )}
+                            Data:{" "}
+                            {new Date(
+                              agendamento.dataAgendamento,
+                            ).toLocaleDateString("pt-BR")}
                           </p>
                           {agendamento.observacoes && (
                             <p className="mt-1 text-sm text-gray-600">
@@ -531,29 +559,46 @@ export default function AnimalDetalhesPage() {
                         </div>
                         <div className="text-right">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${agendamento.status === 'AGENDADO'
-                              ? 'bg-blue-100 text-blue-800'
-                              : agendamento.status === 'REALIZADO'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                              }`}
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              agendamento.status === "AGENDADO"
+                                ? "bg-blue-100 text-blue-800"
+                                : agendamento.status === "REALIZADO"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                            }`}
                           >
-                            {agendamento.status === 'AGENDADO'
-                              ? 'Agendado'
-                              : agendamento.status === 'REALIZADO'
-                                ? 'Realizado'
-                                : 'Cancelado'}
+                            {agendamento.status === "AGENDADO"
+                              ? "Agendado"
+                              : agendamento.status === "REALIZADO"
+                                ? "Realizado"
+                                : "Cancelado"}
                           </span>
-                          {agendamento.status === 'AGENDADO' && isAuthenticated && (
-                            <button
-                              onClick={() =>
-                                handleCancelarAgendamentoVacina(agendamento.id)
-                              }
-                              className="mt-2 inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
-                            >
-                              Cancelar
-                            </button>
-                          )}
+                          {agendamento.status === "AGENDADO" &&
+                            isAuthenticated && (
+                              <div className="flex flex-col gap-1 mt-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    router.push(
+                                      `/agendamentos/vacinas/${agendamento.id}/editar`,
+                                    )
+                                  }
+                                  className="inline-flex items-center px-3 py-1 border border-yellow-300 text-xs leading-4 font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleCancelarAgendamentoVacina(
+                                      agendamento.id,
+                                    )
+                                  }
+                                  className="inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            )}
                         </div>
                       </div>
                     ))}
@@ -565,11 +610,15 @@ export default function AnimalDetalhesPage() {
             {/* Consultas veterinárias */}
             <div className="mt-10 pt-8 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Consultas veterinárias</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Consultas veterinárias
+                </h2>
                 {isAuthenticated && (
                   <button
                     type="button"
-                    onClick={() => router.push(`/animais/${animalId}/agendar-consulta`)}
+                    onClick={() =>
+                      router.push(`/animais/${animalId}/agendar-consulta`)
+                    }
                     className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
                   >
                     Agendar consulta
@@ -584,7 +633,9 @@ export default function AnimalDetalhesPage() {
                   {errorConsultas}
                 </div>
               ) : agendamentosConsulta.length === 0 ? (
-                <p className="text-gray-600">Nenhuma consulta agendada para este animal.</p>
+                <p className="text-gray-600">
+                  Nenhuma consulta agendada para este animal.
+                </p>
               ) : (
                 <div className="space-y-3">
                   {agendamentosConsulta.map((ag) => (
@@ -596,43 +647,62 @@ export default function AnimalDetalhesPage() {
                         <p className="text-sm font-medium text-gray-900">
                           {ag.veterinarioNome}
                           <span className="text-gray-600 font-normal">
-                            {' '}
+                            {" "}
                             · {ag.veterinarioEspecialidade}
                           </span>
                         </p>
                         <p className="text-sm text-gray-600 mt-1">
-                          {new Date(ag.dataHora).toLocaleString('pt-BR', {
-                            dateStyle: 'short',
-                            timeStyle: 'short',
+                          {new Date(ag.dataHora).toLocaleString("pt-BR", {
+                            dateStyle: "short",
+                            timeStyle: "short",
                           })}
                         </p>
                         <p className="text-sm text-gray-700 mt-2">
-                          <span className="font-medium text-gray-700">Motivo:</span> {ag.motivo}
+                          <span className="font-medium text-gray-700">
+                            Motivo:
+                          </span>{" "}
+                          {ag.motivo}
                         </p>
                       </div>
                       <div className="text-right shrink-0 ml-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ag.status === 'AGENDADO'
-                            ? 'bg-blue-100 text-blue-800'
-                            : ag.status === 'REALIZADO'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                            }`}
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            ag.status === "AGENDADO"
+                              ? "bg-blue-100 text-blue-800"
+                              : ag.status === "REALIZADO"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                          }`}
                         >
-                          {ag.status === 'AGENDADO'
-                            ? 'Agendado'
-                            : ag.status === 'REALIZADO'
-                              ? 'Realizado'
-                              : 'Cancelado'}
+                          {ag.status === "AGENDADO"
+                            ? "Agendado"
+                            : ag.status === "REALIZADO"
+                              ? "Realizado"
+                              : "Cancelado"}
                         </span>
-                        {ag.status === 'AGENDADO' && isAuthenticated && (
-                          <button
-                            type="button"
-                            onClick={() => handleCancelarAgendamentoConsulta(ag.id)}
-                            className="mt-2 inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
-                          >
-                            Cancelar
-                          </button>
+                        {ag.status === "AGENDADO" && isAuthenticated && (
+                          <div className="flex flex-col gap-1 mt-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                router.push(
+                                  `/agendamentos/consultas/${ag.id}/editar`,
+                                )
+                              }
+                              className="inline-flex items-center px-3 py-1 border border-yellow-300 text-xs leading-4 font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCancelarAgendamentoConsulta(ag.id)
+                              }
+                              className="inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -644,11 +714,15 @@ export default function AnimalDetalhesPage() {
             {/* Banho e Tosa */}
             <div className="mt-10 pt-8 border-t border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Banho e Tosa</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Banho e Tosa
+                </h2>
 
                 {isAuthenticated && (
                   <button
-                    onClick={() => router.push(`/animais/${animalId}/agendar-banho-tosa`)}
+                    onClick={() =>
+                      router.push(`/animais/${animalId}/agendar-banho-tosa`)
+                    }
                     className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
                   >
                     Agendar banho e tosa
@@ -677,7 +751,7 @@ export default function AnimalDetalhesPage() {
                         </p>
 
                         <p className="text-sm text-gray-600">
-                          {new Date(ag.dataHora).toLocaleString('pt-BR')}
+                          {new Date(ag.dataHora).toLocaleString("pt-BR")}
                         </p>
 
                         <p className="text-sm text-gray-600">
@@ -687,22 +761,36 @@ export default function AnimalDetalhesPage() {
 
                       <div>
                         <span
-                          className={`inline-flex mt-2 px-2 py-1 text-xs rounded-full ${ag.status === 'AGENDADO'
-                            ? 'bg-blue-100 text-blue-800'
-                            : ag.status === 'REALIZADO'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                            }`}
+                          className={`inline-flex mt-2 px-2 py-1 text-xs rounded-full ${
+                            ag.status === "AGENDADO"
+                              ? "bg-blue-100 text-blue-800"
+                              : ag.status === "REALIZADO"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {ag.status}
                         </span>
-                        {ag.status === 'AGENDADO' && isAuthenticated && (
-                          <button
-                            onClick={() => handleCancelarBanhoTosa(ag.id)}
-                            className="mt-2 inline-flex px-3 py-1 text-xs border border-red-300 text-red-700 rounded-md hover:bg-red-50"
-                          >
-                            Cancelar
-                          </button>
+                        {ag.status === "AGENDADO" && isAuthenticated && (
+                          <div className="flex flex-col gap-1 mt-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                router.push(
+                                  `/agendamentos/banho-tosa/${ag.id}/editar`,
+                                )
+                              }
+                              className="inline-flex items-center px-3 py-1 border border-yellow-300 text-xs leading-4 font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => handleCancelarBanhoTosa(ag.id)}
+                              className="inline-flex items-center px-3 py-1 border border-red-300 text-xs leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -714,9 +802,13 @@ export default function AnimalDetalhesPage() {
             {/* Descrição */}
             {animal.descricao && (
               <div className="mt-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Sobre {animal.nome}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Sobre {animal.nome}
+                </h2>
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <p className="text-gray-700 leading-relaxed">{animal.descricao}</p>
+                  <p className="text-gray-700 leading-relaxed">
+                    {animal.descricao}
+                  </p>
                 </div>
               </div>
             )}
@@ -730,7 +822,7 @@ export default function AnimalDetalhesPage() {
                 Voltar para Lista
               </Link>
 
-              {!isAuthenticated && animal.status === 'DISPONIVEL' && (
+              {!isAuthenticated && animal.status === "DISPONIVEL" && (
                 <Link
                   href="/login"
                   className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors"
@@ -753,7 +845,7 @@ export default function AnimalDetalhesPage() {
                     disabled={excluindo}
                     className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 disabled:bg-red-400 transition-colors font-medium"
                   >
-                    {excluindo ? 'Excluindo...' : 'Excluir Animal'}
+                    {excluindo ? "Excluindo..." : "Excluir Animal"}
                   </button>
                 </>
               )}

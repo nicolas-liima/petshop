@@ -82,6 +82,70 @@ public class AgendamentoConsultaService {
         return agendamentoConsultaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento de consulta nao encontrado com o id: " + id));
     }
+    @Transactional
+    public AgendamentoConsulta editar(Long id, AgendamentoConsultaRequestDTO dto) {
+        AgendamentoConsulta agendamento = buscarPorId(id);
+
+        // Valida se o agendamento pode ser editado
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento cancelado.");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.REALIZADO) {
+            throw new BusinessException("Nao e possivel editar um agendamento ja realizado.");
+        }
+
+        // Busca e valida o animal
+        Animal animal = animalRepository.findById(dto.getAnimalId())
+                .orElseThrow(() -> new ResourceNotFoundException("Animal nao encontrado com o id: " + dto.getAnimalId()));
+
+        // Busca e valida o veterinario
+        Veterinario veterinario = veterinarioRepository.findById(dto.getVeterinarioId())
+                .orElseThrow(() -> new ResourceNotFoundException("Veterinario nao encontrado com o id: " + dto.getVeterinarioId()));
+
+        if (!veterinario.getAtivo()) {
+            throw new BusinessException("O veterinario '" + veterinario.getNome() + "' nao esta ativo no momento.");
+        }
+
+        // Valida se a data é futura
+        if (dto.getDataHora().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("A data e hora do agendamento devem ser futuras. Data informada: " + dto.getDataHora());
+        }
+
+        // Verifica conflito de horário, excluindo o próprio agendamento
+        LocalDateTime inicioNovo = dto.getDataHora();
+        LocalDateTime fimNovo = inicioNovo.plusMinutes(DURACAO_CONSULTA_MINUTOS);
+
+        List<AgendamentoConsulta> agendamentosExistentes = agendamentoConsultaRepository
+                .findAllByVeterinarioIdAndStatus(dto.getVeterinarioId(), StatusAgendamento.AGENDADO);
+
+        for (AgendamentoConsulta existente : agendamentosExistentes) {
+            // Ignora o próprio agendamento na verificação de conflito
+            if (existente.getId().equals(id)) {
+                continue;
+            }
+
+            LocalDateTime inicioExistente = existente.getDataHora();
+            LocalDateTime fimExistente = inicioExistente.plusMinutes(DURACAO_CONSULTA_MINUTOS);
+
+            boolean conflito = inicioNovo.isBefore(fimExistente) && fimNovo.isAfter(inicioExistente);
+
+            if (conflito) {
+                throw new ConflictException("Conflito de horario: o veterinario '" + veterinario.getNome()
+                        + "' ja possui uma consulta agendada entre " + inicioExistente + " e " + fimExistente
+                        + ". Escolha outro horario ou veterinario.");
+            }
+        }
+
+        // Atualiza os dados
+        agendamento.setAnimal(animal);
+        agendamento.setVeterinario(veterinario);
+        agendamento.setDataHora(dto.getDataHora());
+        agendamento.setMotivo(dto.getMotivo());
+
+        return agendamentoConsultaRepository.save(agendamento);
+    }
+
 
     public List<AgendamentoConsulta> listarPorAnimal(Long animalId) {
         animalRepository.findById(animalId)
