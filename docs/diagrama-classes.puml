@@ -1,0 +1,302 @@
+@startuml Diagrama de Classes - Sistema PetShop
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Diagrama de Classes de Domínio\nSistema PetShop (API)
+
+' ===================== ENUMS =====================
+enum StatusAnimal {
+  DISPONIVEL
+  EM_PROCESSO_ADOCAO
+  ADOTADO
+}
+
+enum StatusAgendamento {
+  AGENDADO
+  REALIZADO
+  CANCELADO
+}
+
+enum StatusPedido {
+  PENDENTE
+  PAGO
+}
+
+enum StatusProduto {
+  DISPONIVEL
+  INDISPONIVEL
+}
+
+enum TipoServico {
+  BANHO
+  TOSA
+  BANHO_E_TOSA
+}
+
+' ===================== ENTIDADES PRINCIPAIS =====================
+class Usuario {
+  - id: Long
+  - nome: String
+  - email: String
+  - senha: String
+  --
+  + getAuthorities(): Collection
+  + getPassword(): String
+  + getUsername(): String
+}
+
+class Animal {
+  - id: Long
+  - nome: String
+  - idade: Integer
+  - especie: String
+  - raca: String
+  - cor: String
+  - sexo: String
+  - tamanho: String
+  - descricao: String
+  - vacinado: Boolean
+  - castrado: Boolean
+  - status: StatusAnimal
+  - urlImagem: String
+}
+
+class Vacina {
+  - id: Long
+  - nome: String
+  - fabricante: String
+  - estoque: int
+}
+
+class Funcionario {
+  - id: Long
+  - nome: String
+  - cargo: String
+  - cpf: String
+  - crmv: String
+  - email: String
+  - ativo: Boolean
+}
+
+class Veterinario {
+  - id: Long
+  - nome: String
+  - especialidade: String
+  - ativo: Boolean
+}
+
+class Produto {
+  - id: Long
+  - nome: String
+  - preco: BigDecimal
+  - quantidade: int
+  - statusProduto: StatusProduto
+  --
+  + atualizarStatus(): void
+}
+
+class Pedido {
+  - id: Long
+  - total: BigDecimal
+  - status: StatusPedido
+}
+
+class ItemPedido {
+  - id: Long
+  - quantidade: Integer
+  - subtotal: BigDecimal
+}
+
+' ===================== AGENDAMENTOS =====================
+class AgendamentoVacina {
+  - id: Long
+  - dataAgendamento: LocalDate
+  - observacoes: String
+  - status: StatusAgendamento
+}
+
+class AgendamentoConsulta {
+  - id: Long
+  - dataHora: LocalDateTime
+  - motivo: String
+  - status: StatusAgendamento
+}
+
+class AgendamentoBanhoTosa {
+  - id: Long
+  - dataHora: LocalDateTime
+  - tipoServico: TipoServico
+  - duracaoEstimadaMinutos: Integer
+  - status: StatusAgendamento
+}
+
+' ===================== CAMADA DE SERVIÇO =====================
+package "Camada de Serviços" <<Rectangle>> {
+  class UsuarioService {
+    + salvarUsuario(dto): UsuarioResponseDTO
+    + listarTodosUsuarios(): List
+    + buscarUsuarioPorId(id): UsuarioResponseDTO
+    + buscarUsuarioPorEmail(email): UsuarioResponseDTO
+    + atualizarUsuario(id, dto): UsuarioResponseDTO
+    + deletarUsuario(id): void
+  }
+
+  class AnimalService {
+    + cadastrarAnimal(dto): Animal
+    + adotarAnimal(id, usuarioId): Animal
+    + listarAnimais(status): List
+    + listarPorAdotante(usuarioId): List
+    + buscarPorId(id): Animal
+    + atualizarAnimal(id, dto): Animal
+    + deletarAnimal(id): void
+    + salvarImagem(id, imagem): Animal
+  }
+
+  class AgendamentoVacinaService {
+    + agendar(dto): AgendamentoVacina
+    + listarTodos(): List
+    + listarPorAnimal(animalId): List
+    + buscarPorId(id): AgendamentoVacina
+    + editar(id, dto): AgendamentoVacina
+    + cancelar(id): AgendamentoVacina
+  }
+
+  class AgendamentoConsultaService {
+    + agendar(dto): AgendamentoConsulta
+    + listarTodos(): List
+    + listarPorAnimal(animalId): List
+    + buscarPorId(id): AgendamentoConsulta
+    + editar(id, dto): AgendamentoConsulta
+    + cancelar(id): AgendamentoConsulta
+  }
+
+  class AgendamentoBanhoTosaService {
+    + agendar(dto): AgendamentoBanhoTosa
+    + listarTodos(): List
+    + listarPorAnimal(animalId): List
+    + buscarPorId(id): AgendamentoBanhoTosa
+    + editar(id, dto): AgendamentoBanhoTosa
+    + cancelar(id): AgendamentoBanhoTosa
+  }
+
+  class ProntuarioService {
+    + obterProntuario(animalId): ProntuarioResponseDTO
+  }
+
+  class FuncionarioService {
+    + cadastrar(dto): Funcionario
+    + listarTodos(): List
+    + buscarPorId(id): Funcionario
+  }
+
+  class ProdutoService {
+    + criarProduto(dto): Produto
+    + listarTodosProdutos(): List
+    + listarProdutosDoUsuario(): List
+    + listarPorId(id): Produto
+    + atualizarProduto(dto, id): Produto
+    + deletarProduto(id): void
+  }
+
+  class PedidoService {
+    + criarVenda(dto): PedidoResponseDTO
+    + listarPedidosDoUsuario(): List
+    + buscarPedidoPorId(id): PedidoResponseDTO
+    + deletarPedido(id): void
+  }
+
+  class FileStorageService {
+    + init(): void
+    + store(arquivo): String
+  }
+}
+
+' Controllers sem camada Service (acesso direto ao Repository)
+class VacinaController <<controller>> {
+  + cadastrar / listar / buscar
+}
+
+class VeterinarioController <<controller>> {
+  + cadastrar / listar / buscar
+}
+
+' ===================== RELACIONAMENTOS DE DOMÍNIO =====================
+
+Usuario "1" -- "0..*" Animal : adota >
+Usuario "1" -- "0..*" Produto : cadastra >
+Usuario "1" -- "0..*" Pedido : realiza >
+
+Animal "1" -- "0..*" AgendamentoVacina : possui >
+Animal "1" -- "0..*" AgendamentoConsulta : possui >
+Animal "1" -- "0..*" AgendamentoBanhoTosa : possui >
+Animal --> StatusAnimal
+
+AgendamentoVacina "0..*" -- "1" Vacina : utiliza >
+AgendamentoVacina --> StatusAgendamento
+
+AgendamentoConsulta "0..*" -- "1" Veterinario : atendido por >
+AgendamentoConsulta --> StatusAgendamento
+
+AgendamentoBanhoTosa "0..*" -- "1" Funcionario : executado por >
+AgendamentoBanhoTosa --> TipoServico
+AgendamentoBanhoTosa --> StatusAgendamento
+
+Pedido "1" *-- "1..*" ItemPedido : contém
+ItemPedido "0..*" -- "1" Produto : referencia >
+Pedido --> StatusPedido
+Produto --> StatusProduto
+
+' Serviços
+UsuarioService ..> Usuario
+AnimalService ..> Animal
+AnimalService ..> FileStorageService : upload imagem
+AgendamentoVacinaService ..> AgendamentoVacina
+AgendamentoVacinaService ..> Vacina
+AgendamentoConsultaService ..> AgendamentoConsulta
+AgendamentoConsultaService ..> Veterinario
+AgendamentoBanhoTosaService ..> AgendamentoBanhoTosa
+AgendamentoBanhoTosaService ..> Funcionario
+ProntuarioService ..> Animal
+ProntuarioService ..> AgendamentoVacina
+ProntuarioService ..> AgendamentoConsulta
+ProntuarioService ..> AgendamentoBanhoTosa
+FuncionarioService ..> Funcionario
+ProdutoService ..> Produto
+PedidoService ..> Pedido
+PedidoService ..> ItemPedido
+PedidoService ..> Produto : valida/decrementa estoque
+
+VacinaController ..> Vacina : persiste via Repository
+VeterinarioController ..> Veterinario : persiste via Repository
+
+note bottom of Funcionario
+  Entidade separada de Veterinario.
+  Se cargo = "Veterinario", CRMV
+  é obrigatório. CPF e e-mail únicos.
+  Usado em agendamentos de banho/tosa.
+end note
+
+note bottom of Veterinario
+  Entidade independente de Funcionario.
+  Usado em agendamentos de consulta.
+end note
+
+note bottom of StatusAnimal
+  EM_PROCESSO_ADOCAO existe no enum
+  mas não é atribuído por nenhum
+  endpoint atualmente.
+end note
+
+note bottom of StatusAgendamento
+  REALIZADO existe no enum mas não
+  há endpoint para marcar como realizado.
+end note
+
+note bottom of ProntuarioService
+  Não possui entidade própria.
+  Agrega os 3 tipos de agendamento
+  em DTO de resposta.
+end note
+
+@enduml

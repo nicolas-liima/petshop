@@ -1,0 +1,153 @@
+@startuml Diagrama de Casos de Uso - Sistema PetShop
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title Diagrama de Casos de Uso\nSistema PetShop
+
+actor "Visitante" as Visitante
+actor "Usuário\nAutenticado" as Usuario
+
+rectangle "Sistema PetShop" {
+
+  ' --- Autenticação ---
+  usecase "UC01\nCadastrar Usuário" as UC01
+  usecase "UC02\nRealizar Login" as UC02
+  usecase "UC03\nRealizar Logout" as UC03
+
+  ' --- Animais e Adoção ---
+  usecase "UC04\nCadastrar Animal\npara Adoção" as UC04
+  usecase "UC05\nListar Animais" as UC05
+  usecase "UC06\nVisualizar Detalhes\ndo Animal" as UC06
+  usecase "UC07\nAdotar Animal" as UC07
+  usecase "UC08\nConsultar Meus Animais" as UC08
+  usecase "UC09\nAtualizar Dados\ndo Animal" as UC09
+  usecase "UC10\nExcluir Animal" as UC10
+  usecase "UC11\nEnviar Imagem\ndo Animal" as UC11
+
+  ' --- Agendamentos ---
+  usecase "UC12\nAgendar Vacina" as UC12
+  usecase "UC13\nAgendar Consulta\nVeterinária" as UC13
+  usecase "UC14\nAgendar Banho e Tosa" as UC14
+  usecase "UC15\nListar Agendamentos" as UC15
+  usecase "UC16\nCancelar Agendamento" as UC16
+  usecase "UC17\nEditar Agendamento" as UC17
+
+  ' --- Prontuário ---
+  usecase "UC18\nVisualizar Prontuário\n(Histórico Médico)" as UC18
+
+  ' --- Cadastros ---
+  usecase "UC19\nCadastrar Vacina" as UC19
+  usecase "UC20\nCadastrar Veterinário" as UC20
+  usecase "UC21\nCadastrar Funcionário" as UC21
+  usecase "UC22\nConsultar Funcionários" as UC22
+  usecase "UC23\nCadastrar Produto" as UC23
+  usecase "UC24\nGerenciar Produtos" as UC24
+  usecase "UC25\nGerenciar Usuários" as UC25
+
+  ' --- Loja e Pedidos ---
+  usecase "UC26\nNavegar na Loja" as UC26
+  usecase "UC27\nAdicionar ao Carrinho" as UC27
+  usecase "UC28\nFinalizar Pedido" as UC28
+  usecase "UC29\nConsultar Pedidos" as UC29
+  usecase "UC30\nExcluir Pedido" as UC30
+
+  ' --- Casos de uso auxiliares (include) ---
+  usecase "Validar Autenticação" as ValAuth
+  usecase "Validar Estoque\nde Vacina" as ValEstVac
+  usecase "Validar Disponibilidade\nde Horário" as ValHorario
+  usecase "Validar Estoque\nde Produto" as ValEstProd
+}
+
+' --- Associações Visitante (acesso público na API e no frontend) ---
+Visitante --> UC01
+Visitante --> UC02
+Visitante --> UC05
+Visitante --> UC06
+Visitante --> UC26
+
+' --- Associações Usuário Autenticado ---
+Usuario --> UC02
+Usuario --> UC03
+Usuario --> UC04
+Usuario --> UC05
+Usuario --> UC06
+Usuario --> UC07
+Usuario --> UC08
+Usuario --> UC09
+Usuario --> UC10
+Usuario --> UC11
+Usuario --> UC12
+Usuario --> UC13
+Usuario --> UC14
+Usuario --> UC15
+Usuario --> UC16
+Usuario --> UC17
+Usuario --> UC18
+Usuario --> UC19
+Usuario --> UC20
+Usuario --> UC21
+Usuario --> UC22
+Usuario --> UC23
+Usuario --> UC24
+Usuario --> UC25
+Usuario --> UC26
+Usuario --> UC27
+Usuario --> UC28
+Usuario --> UC29
+Usuario --> UC30
+
+' --- Relacionamentos include ---
+UC03 ..> ValAuth : <<include>>
+UC07 ..> ValAuth : <<include>>
+UC08 ..> ValAuth : <<include>>
+UC12 ..> ValAuth : <<include>>
+UC12 ..> ValEstVac : <<include>>
+UC13 ..> ValAuth : <<include>>
+UC13 ..> ValHorario : <<include>>
+UC14 ..> ValAuth : <<include>>
+UC14 ..> ValHorario : <<include>>
+UC16 ..> ValAuth : <<include>>
+UC17 ..> ValAuth : <<include>>
+UC18 ..> ValAuth : <<include>>
+UC28 ..> ValAuth : <<include>>
+UC28 ..> ValEstProd : <<include>>
+
+note top of Usuario
+  No código todos os usuários possuem
+  a mesma role (ROLE_USER).
+  Não há perfil Admin separado
+  no backend — o ator representa
+  qualquer usuário logado.
+end note
+
+note right of UC12
+  Valida data futura (não permite hoje),
+  existência do animal e da vacina,
+  estoque disponível e decrementa
+  estoque ao agendar.
+end note
+
+note right of UC14
+  Valida funcionário ativo,
+  estima duração (60/45/90 min)
+  e bloqueia conflito de horário
+  (double booking).
+end note
+
+note right of UC18
+  API: GET /prontuarios/animal/{id}
+  agrega vacinas, consultas e
+  banho/tosa ordenados cronologicamente.
+  Frontend: histórico parcial na
+  tela de detalhes do animal.
+end note
+
+note right of UC11
+  Implementado na API
+  (PATCH /animais/{id}/imagem).
+  Ainda sem tela no frontend.
+end note
+
+@enduml
